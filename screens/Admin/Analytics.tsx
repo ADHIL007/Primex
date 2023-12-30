@@ -55,7 +55,7 @@ const Analytics = ({navigation}: AnalyticsProps) => {
             name: `Region ${school.region}`,
             staffs: staffs,
             students: students,
-            stocksrate: 0,
+
             Rid: school.region,
             schoolsCount: 1,
           });
