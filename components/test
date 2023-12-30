@@ -1,0 +1,166 @@
+import React, {useState} from 'react';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+const Horizontal = () => {
+  const initialCommodities = [
+    'Chairs',
+    'Desks',
+    'Chalk',
+    'Pens',
+    'Papers',
+    'Notebooks',
+    'Textbooks',
+    'Whiteboards',
+    'Erasers',
+    'Pencils',
+    'Markers',
+    'Rulers',
+    'Computers',
+    'Printers',
+    'Projectors',
+    'Globes',
+    'Sports Equipment',
+    'Library Books',
+    'Cleaning Supplies',
+    'First Aid Kits',
+    'Art Supplies',
+    'Musical Instruments',
+    'Science Lab Equipment',
+    'Microscopes',
+    'Safety Goggles',
+    'Classroom Furniture',
+  ];
+
+  const [availableCommodities, setAvailableCommodities] = useState([]);
+  const [unavailableCommodities, setUnavailableCommodities] = useState([]);
+  const [commodities, setCommodities] = useState(
+    initialCommodities.map(item => ({
+      name: item,
+      selected: false,
+      index: null,
+    })),
+  );
+
+  const handleActionPress = (index, isAccept) => {
+    const updatedCommodities = [...commodities];
+    updatedCommodities[index].selected = isAccept;
+    setCommodities(updatedCommodities);
+
+    const selectedCommodity = updatedCommodities[index];
+
+    if (isAccept) {
+      setAvailableCommodities(prev =>
+        prev.some(item => item.index === index)
+          ? prev
+          : [...prev, selectedCommodity],
+      );
+    } else {
+      setUnavailableCommodities(prev =>
+        prev.some(item => item.index === index)
+          ? prev
+          : [...prev, selectedCommodity],
+      );
+    }
+
+    console.log('Accepted Commodities:', availableCommodities);
+    console.log('Deleted Commodities:', unavailableCommodities);
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        horizontal
+        contentContainerStyle={styles.scrollViewContent}
+        showsHorizontalScrollIndicator={false}>
+        {commodities.map((item, index) => (
+          <View
+            key={index}
+            style={[
+              styles.commodityItem,
+              {
+                backgroundColor: item.selected
+                  ? availableCommodities.some(
+                      selectedItem => selectedItem.index === index,
+                    )
+                    ? 'green'
+                    : 'red'
+                  : '#fff',
+              },
+            ]}>
+            <Image
+              source={require('../assets/Commodities/kansai-university-84363_640.jpg')}
+              style={styles.image}
+            />
+            <Text style={styles.itemName}>{item.name}</Text>
+            <View style={styles.actionContainer}>
+              <TouchableOpacity onPress={() => handleActionPress(index, true)}>
+                <Image
+                  source={require('../assets/graphics/accept.png')}
+                  style={styles.actionImage}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleActionPress(index, false)}>
+                <Image
+                  source={require('../assets/graphics/delete-button.png')}
+                  style={styles.actionImage}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollViewContent: {
+    flexDirection: 'row',
+  },
+  commodityItem: {
+    width: 390,
+    height: 500,
+    marginHorizontal: 10,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    marginBottom: 16,
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  itemName: {
+    color: '#333',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  actionContainer: {
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  actionImage: {
+    width: 40,
+    height: 40,
+    margin: 8,
+  },
+});
+
+export default Horizontal;

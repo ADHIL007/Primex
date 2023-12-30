@@ -89,6 +89,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+   release {
+      storeFile file('your_key_name.keystore')
+      storePassword 'your_key_store_password'
+      keyAlias 'your_key_alias'
+      keyPassword 'your_key_file_alias_password'
+    }
     }
     buildTypes {
         debug {
@@ -108,7 +114,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.facebook.react:flipper-integration")
-
+implementation project(':react-native-vector-icons')
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
@@ -117,3 +123,4 @@ dependencies {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
