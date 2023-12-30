@@ -25,7 +25,9 @@ export type RootStackParamList = {
   Profile: undefined;
   RegionData: {
     RegionID: string;
+    SchoolData: Array<{ totalSchools: number; totalStaffs: number; totalStudents: number }>;
   };
+
   Main: undefined;
   Analytics: undefined;
   AdminHome: undefined;

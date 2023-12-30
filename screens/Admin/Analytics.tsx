@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,94 +11,74 @@ import {
 import PieCharts from '../../components/PieCharts';
 import AnalyticsDatas from '../../components/AnalyticsDatas';
 import RegionCards from '../../components/RegionCards';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../App';
-import {getData} from '../AsyncStorage';
-import { addDoc, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../App';
+import { getData, storeData } from '../AsyncStorage';
+import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { Firebase_DB } from '../FirebaseConfig';
+import { categorizeByRegion } from './categorize';
+import { RegionData } from './categorize';
 
 type AnalyticsProps = NativeStackScreenProps<RootStackParamList, 'Analytics'>;
 
-const Analytics = ({navigation}: AnalyticsProps) => {
+const Analytics = ({ navigation }: AnalyticsProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [totalSchools, setTotalSchools] = useState(0);
   const [totalStaffs, setTotalStaffs] = useState(0);
-  const [schoolData, setSchoolData] = useState([]);
-
-
-
-  const [RegionData, setRegionData] = useState([]);
-
-
+  const [regionData, setRegionData] = useState([]);
+  const [prevTotalSchools, setPrevTotalSchools] = useState(0); // Added state for previous total schools
 
   const fetchSchoolsData = async () => {
     try {
-      const schoolsData = await getData('SCHOOLS');
-      let totalStaffs = 0;
-      let regionData: any[] = [];
+      const schools = await getData('SCHOOLS');
 
-      schoolsData.forEach((school) => {
-        const staffs = parseInt(school.numberOfStaffs) || 0;
-        const students = parseInt(school.numberOfStudents) || 0;
 
-        totalStaffs += staffs;
+      const RegionWiseData = categorizeByRegion(schools);
 
-        const regionIndex = regionData.findIndex((region) => region.Rid === school.region);
+      const regionArrays: Record<string, RegionData[]> = {};
 
-        if (regionIndex !== -1) {
-          regionData[regionIndex].schoolsCount += 1;
-          regionData[regionIndex].students += students;
-          regionData[regionIndex].staffs += staffs;
-        } else {
-          regionData.push({
-            name: `Region ${school.region}`,
-            staffs: staffs,
-            students: students,
+      // Populate regionArrays with region-wise data
+      Object.entries(RegionWiseData).forEach(([region, data]) => {
+        // Convert each region's data to an array and store it in regionArrays
 
-            Rid: school.region,
-            schoolsCount: 1,
-          });
+
+        if (!regionArrays[region]) {
+          regionArrays[region] = [];
         }
+        regionArrays[region].push(data);
       });
 
-      setTotalStaffs(totalStaffs);
-      setTotalSchools(schoolsData.length);
-      setSchoolData(schoolsData);
-      setRegionData(regionData);
+      // Accumulate totalSchools and totalStaffs after processing all data
+      let updatedTotalSchools = totalSchools;
+      let updatedTotalStaffs = totalStaffs;
 
-      const docRef = doc(Firebase_DB, 'Records', 'SchoolData'); // Replace 'your_document_id' with the actual document ID
+      // Process the accumulated region data
+      Object.values(regionArrays).forEach((regionDataArray) => {
+        regionDataArray.forEach((data) => {
+          updatedTotalSchools += data.totalSchools;
+          updatedTotalStaffs += data.totalStaffs;
+        });
+      });
 
-      const docSnap = await getDoc(docRef);
-      // Check if totalSchools has changed
-      const prevTotalSchools = getDoc(docRef).totalSchools
+      // Update state with region-wise data
+      console.log(regionArrays);
+      setRegionData(regionArrays);
 
-      if(prevTotalSchools !== totalSchools) {
-        // Update the total staffs and set the regionData state
-        setTotalStaffs(totalStaffs);
-        setTotalSchools(schoolsData.length);
-        setSchoolData(schoolsData);
-        setRegionData(regionData);
+      // Check if the number of schools has changed
+      if (updatedTotalSchools !== totalSchools) {
+        setTotalSchools(updatedTotalSchools); // Update total schools
+        setTotalStaffs(updatedTotalStaffs);   // Update total staffs
 
-        // Fetch the existing document from the Records collection
+        // Update Firebase only if the number of schools changes
+        const dbCollection = collection(Firebase_DB, 'Records');
+        const docRef = doc(dbCollection, 'SchoolData');
 
-
-        // Update the Records collection if the document exists
-        if (docSnap.exists()) {
-          await updateDoc(docRef, {
-            totalSchools: totalSchools,
-            totalStaffs: totalStaffs,
-            RegionData: regionData,
-          });
-        } else {
-          // Otherwise, add a new document to the Records collection
-          const DbCollection = collection(Firebase_DB, 'Records');
-          await addDoc(DbCollection, {
-            totalSchools: totalSchools,
-            totalStaffs: totalStaffs,
-            RegionData: regionData,
-          });
-        }
+        // Update the document with the new data
+        await updateDoc(docRef, { data: regionArrays });
+        await storeData('SCHOOLSDATA', regionArrays);
+        await storeData('TOTALSCHOOLS', updatedTotalSchools);
+        await storeData('TOTALSTAFFS', updatedTotalStaffs);
       }
     } catch (error) {
       console.error('Error fetching schools data:', error);
@@ -107,8 +87,32 @@ const Analytics = ({navigation}: AnalyticsProps) => {
     }
   };
 
+
+  const refreshData = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(Firebase_DB, 'Schools'));
+      const newData = [];
+
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, ' => ', doc.data());
+        newData.push({
+          // You can format the data here as needed
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+
+      console.log('New data:', newData);
+     storeData("SCHOOLS",newData)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    refreshData()
+    console.log('Refreshing');
+
     setTimeout(() => {
       fetchSchoolsData();
       setRefreshing(false);
@@ -140,9 +144,9 @@ const Analytics = ({navigation}: AnalyticsProps) => {
         </View>
       ) : (
         <>
-          <PieCharts />
+          <PieCharts data={regionData} />
           <AnalyticsDatas count={totalSchools} countOfStaffs={totalStaffs} />
-          <RegionCards navigation={navigation} schoolData={RegionData}  />
+          <RegionCards navigation={navigation} schoolData={regionData} />
         </>
       )}
     </ScrollView>

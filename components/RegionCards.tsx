@@ -1,31 +1,28 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
-const RegionCards = ({ navigation ,schoolData }) => {
-  const RegionData = schoolData
+// Inside the RegionCards component
+const RegionCards = ({ navigation, schoolData }: any) => {
+  const regionData = schoolData;
 
   return (
     <View style={styles.gridContainer}>
-      {RegionData.map((item) => (
+      {Object.entries(regionData).map(([region, data]) => (
         <TouchableOpacity
-          key={item.Rid}
+          key={region}
           style={styles.card}
-          onPress={() => navigation.navigate('RegionData', { RegionID: item.Rid })}
+          onPress={() => navigation.navigate('RegionData', { RegionID: region, SchoolData: regionData[region] })}
+
         >
-          <Text style={styles.cardTitle}>{item.name}</Text>
-          <View style={styles.cardDetails}>
-            <Text style={styles.detailText}>Staffs: {item.staffs}</Text>
-            <Text style={styles.detailText}>Students: {item.students}</Text>
-            <Text style={styles.detailText}>Ratio: {(item.students / item.staffs).toFixed(2)}</Text>
-            <Text
-              style={[
-                styles.detailText,
-                { color: item.stocksrate === 10 ? '#36AE7C' : '#FA7070' },
-              ]}
-            >
-              Stocks: {item.stocksrate === 10 ? 'Sufficient' : 'Needed'}
-            </Text>
-          </View>
+          <Text style={styles.cardTitle}>{region}</Text>
+          {data.map((item: any, index: number) => (
+            <View key={index} style={styles.cardDetails}>
+              <Text style={styles.detailText}>Schools: {item.totalSchools}</Text>
+              <Text style={styles.detailText}>Staffs: {item.totalStaffs}</Text>
+              <Text style={styles.detailText}>Students: {item.totalStudents}</Text>
+              <Text style={styles.detailText}>Ratio: {(item.totalStudents / item.totalStaffs).toFixed(2)}</Text>
+            </View>
+          ))}
         </TouchableOpacity>
       ))}
     </View>
@@ -42,7 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   card: {
-    flexBasis: '48%', // Adjust this value as needed to control the width of each card
+    flexBasis: '48%',
     flexDirection: 'column',
     alignItems: 'stretch',
     justifyContent: 'space-between',
