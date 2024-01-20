@@ -2,6 +2,7 @@ import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 const FlatCardAdmin = ({navigation}: any) => {
   return (
     <View style={styles.container}>
@@ -58,7 +59,7 @@ const FlatCardAdmin = ({navigation}: any) => {
 
       <TouchableOpacity
         style={styles.MedBtn}
-        onPress={() => navigation.navigate('ManageSchools',{navigation : navigation})}>
+        onPress={() => navigation.navigate('ManageSchool')}>
         <FontAwesome name="gears" size={24} color="white" />
 
         <Text style={styles.buttonText}>Manage Schools</Text>
@@ -118,8 +119,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: RFPercentage(2.1),
     color: 'white',
     marginLeft: 10,
   },

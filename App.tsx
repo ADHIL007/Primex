@@ -14,7 +14,7 @@ import AdminHome from './screens/Admin/AdminHome';
 import RepresentativeList from './screens/Admin/RepresentativeList';
 import RecentActivity from './screens/Admin/RecentActivity';
 import AddSchool from './screens/Admin/AddSchool';
-import ManageSchool from './screens/Admin/ManageSchool';
+import ManageSchool from './screens/Admin/ManageSchool'
 
 
 export type RootStackParamList = {

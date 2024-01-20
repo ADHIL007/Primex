@@ -2,8 +2,9 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getData } from '../screens/AsyncStorage';
+import store from '../Redux/Store';
 
-const CountOfSchools = ({length}) => {
+const CountOfSchools = () => {
 
 
   return (
@@ -18,7 +19,7 @@ const CountOfSchools = ({length}) => {
       </View>
       <View style={styles.circleContainer}>
         <View style={styles.circle}>
-          <Text style={styles.text}>{length}</Text>
+          <Text style={styles.text}>{store.getState().SCHOOL_COUNT}</Text>
           <Text style={styles.schoolText}>Schools</Text>
         </View>
       </View>

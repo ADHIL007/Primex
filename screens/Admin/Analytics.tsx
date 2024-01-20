@@ -18,6 +18,7 @@ import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/fi
 import { Firebase_DB } from '../FirebaseConfig';
 import { categorizeByRegion } from './categorize';
 import { RegionData } from './categorize';
+import store from '../../Redux/Store';
 
 type AnalyticsProps = NativeStackScreenProps<RootStackParamList, 'Analytics'>;
 
@@ -47,6 +48,12 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
           regionArrays[region] = [];
         }
         regionArrays[region].push(data);
+        store.dispatch({
+          type:`R${region}`,
+          payload: {
+            data
+          }
+        })
       });
 
       // Accumulate totalSchools and totalStaffs after processing all data
@@ -91,8 +98,7 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
   const refreshData = async () => {
     try {
       const querySnapshot = await getDocs(collection(Firebase_DB, 'Schools'));
-      const newData = [];
-
+      const newData: Array<any> = [];
       querySnapshot.forEach((doc) => {
         console.log(doc.id, ' => ', doc.data());
         newData.push({
@@ -103,11 +109,26 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
       });
 
       console.log('New data:', newData);
-     storeData("SCHOOLS",newData)
+      storeData("SCHOOLS", newData);
+
+      store.dispatch({
+        type: "SCHOOL_LIST",
+        payload: {
+          data: newData
+        }
+      });
+
+      store.dispatch({
+        type: "SCHOOL_COUNT",
+        payload: {
+          count: newData.length
+        }
+      });
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     refreshData()

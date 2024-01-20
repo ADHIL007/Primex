@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const SchoolList = ({school, number}) => {
   if (!school || !school.labFeatures) {
     return null;
@@ -18,7 +19,7 @@ const SchoolList = ({school, number}) => {
       style={[
         styles.card,
         {
-          backgroundColor: number % 2 === 0 ? '#eeeeee' : '#fff',
+          backgroundColor: number % 2 === 0 ? '#ffffff' : '#f1f2f6',
         },
       ]}>
       <View style={styles.rowContainer}>
@@ -26,36 +27,44 @@ const SchoolList = ({school, number}) => {
         <Text style={styles.schoolName}>{school.schoolName}</Text>
       </View>
       <View style={styles.infoContainer}>
-        <Text style={styles.location}>{school.location}</Text>
+        <Text style={styles.location}>
+          <MaterialIcons
+            name="location-on"
+            size={RFPercentage(1.7)}
+            color="#333"
+          />
+          {school.location}{' '}
+        </Text>
       </View>
       <View style={styles.infoMainContainer}>
         <View style={styles.infoContainer}>
-          <Text style={styles.details}>
-            Staff Members:
-            <Text
-              style={{
-                fontSize: 28,
-                fontWeight: 'bold',
-                color: '#333',
-              }}>
-              {school.numberOfStaffs}
-            </Text>
+          <Text style={styles.StaffLabel}>Staff Members:</Text>
+          <Text
+            style={{
+              fontSize: RFPercentage(2.8),
+              color: '#333',
+            }}>
+            {school.numberOfStaffs}
           </Text>
-
           <Text
             style={[
               styles.details,
-              {backgroundColor: school.playground ? '#A6CF98' : '#FF8F8F',
-              padding: 5,
-              borderRadius: 10,},
+              {
+                backgroundColor: school.playground ? '#2ecc71' : '#fc5c65',
+                padding: 5,
+                borderRadius: 10,
+              },
             ]}>
             Playground: {school.playground ? 'Yes' : 'No'}
           </Text>
           <Text
             style={[
               styles.details,
-              {backgroundColor: school.hasSchoolBus ? '#A6CF98' : '#FF8F8F',padding: 5,
-              borderRadius: 10,},
+              {
+                backgroundColor: school.hasSchoolBus ? '#2ecc71' : '#fc5c65',
+                padding: 5,
+                borderRadius: 10,
+              },
             ]}>
             School Bus: {school.hasSchoolBus ? 'Yes' : 'No'}
           </Text>
@@ -91,10 +100,9 @@ const SchoolList = ({school, number}) => {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 10,
-    elevation: 5,
-    margin: 10,
-    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+    padding: 14,
     width: '100%',
   },
   rowContainer: {
@@ -102,7 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   number: {
-    backgroundColor: '#7BD3EA',
+    backgroundColor: '#1e90ff',
     padding: 5,
     borderRadius: 50,
     width: 30,
@@ -113,7 +121,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   schoolName: {
-    fontSize: 25,
+    fontSize: RFPercentage(3.4),
     color: '#333333',
   },
   infoMainContainer: {
@@ -130,14 +138,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  StaffLabel: {
+    fontSize: RFPercentage(1.8),
+    color: '#333',
+  },
+
   tag: {
-    fontSize: 16,
+    fontSize: RFPercentage(1.6),
     fontWeight: 'bold',
-    color: '#333333',
-    margin: 10,
+    color: '#fff',
+    margin: 5,
   },
   boys: {
-    backgroundColor: '#7BD3EA',
+    backgroundColor: '#2d98da',
     padding: 5,
     borderRadius: 10,
   },
@@ -147,34 +160,33 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   details: {
-    fontSize: 16,
-    color: '#555555',
+    fontSize: RFPercentage(1.6),
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
   location: {
-    fontSize: 17,
+    fontSize: RFPercentage(1.7),
     color: 'rgba(0,0,0,0.5)',
     marginLeft: 35,
-    fontStyle: 'italic',
   },
   labFeaturesContainer: {
     marginTop: 10,
   },
   labFeaturesLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: RFPercentage(1.8),
     marginBottom: 5,
-    color: '#333333',
+    color: '#333',
   },
   labFeaturesList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   labFeature: {
-    fontSize: 16,
-    backgroundColor: '#888',
+    fontSize: RFPercentage(1.6),
+    backgroundColor: '#45aaf2',
     padding: 5,
     borderRadius: 10,
-    color: '#eee',
+    color: '#fff',
     margin: 5,
     elevation: 5,
   },

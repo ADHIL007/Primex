@@ -1,32 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, {useState, useEffect} from 'react';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Analytics from './Analytics';
 import Requests from './Requests';
 import Profile from './Profile';
 import AdminHome from './AdminHome';
-import { Firebase_DB } from '../FirebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import store from '../../Redux/Store';
 
 const Tab = createBottomTabNavigator();
 
 const AdminNavigationTab = () => {
-  const [length, setLength] = useState(0);
 
-  useEffect(() => {
-    const fetchRequestsLength = async () => {
-      try {
-        const requestsCollection = collection(Firebase_DB, 'Requests');
-        const querySnapshot = await getDocs(requestsCollection);
-        setLength(querySnapshot.size); // Use size to get the number of documents
-      } catch (error) {
-        console.error('Error fetching requests length:', error);
-      }
-    };
-
-    fetchRequestsLength();
-  }, []);
 
   return (
     <Tab.Navigator
@@ -47,15 +32,14 @@ const AdminNavigationTab = () => {
         tabBarIconStyle: {
           marginBottom: -1,
         },
-      }}
-    >
+      }}>
       <Tab.Screen
-        name="Home"
+        name="AdminHome"
         component={AdminHome}
         options={{
           tabBarLabel: 'Home',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({color, size}) => (
             <MaterialCommunityIcons name="home" color={color} size={size} />
           ),
         }}
@@ -66,7 +50,7 @@ const AdminNavigationTab = () => {
         options={{
           tabBarLabel: 'Analytics',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({color, size}) => (
             <Ionicons name="analytics" color={color} size={size} />
           ),
         }}
@@ -77,19 +61,25 @@ const AdminNavigationTab = () => {
         options={{
           tabBarLabel: 'Requests',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="view-list" color={color} size={size} />
+          tabBarIcon: ({color, size}) => (
+            <MaterialCommunityIcons
+              name="view-list"
+              color={color}
+              size={size}
+            />
           ),
-          tabBarBadge: length > 0 ? length : null,
+          tabBarBadge:
+            store.getState().REQUESTS > 0 ? store.getState().REQUESTS : null,
         }}
       />
+
       <Tab.Screen
         name="Profile"
         component={Profile}
         options={{
           tabBarLabel: 'Profile',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({color, size}) => (
             <MaterialCommunityIcons name="account" color={color} size={size} />
           ),
         }}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 
 // Inside the RegionCards component
 const RegionCards = ({ navigation, schoolData }: any) => {
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: RFPercentage(2),
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 8,
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   detailText: {
-    fontSize: 14,
+    fontSize: RFPercentage(1.6),
     color: '#555',
     marginBottom: 4,
   },

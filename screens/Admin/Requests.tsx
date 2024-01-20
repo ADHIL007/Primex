@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import {
   getDocs,
@@ -17,44 +18,52 @@ import {
   addDoc,
   getDoc,
 } from 'firebase/firestore';
-import {Firebase_DB, Firebase_Auth} from '../FirebaseConfig';
-import {createUserWithEmailAndPassword} from 'firebase/auth/cordova';
+import { Firebase_DB, Firebase_Auth } from '../FirebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth/cordova';
+import store from '../../Redux/Store';
 
 const Requests = () => {
   const [reqs, setReqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [empty, setEmpty] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const UserCollection = collection(Firebase_DB, 'Users');
   const RequestsCollection = collection(Firebase_DB, 'Requests');
   const auth = Firebase_Auth;
+  const [queryLength, setQueryLength] = useState(0);
+  const fetchRequests = async () => {
+    try {
+      const requestsCollection = collection(Firebase_DB, 'Requests');
+     const querySnapshot = await getDocs(requestsCollection);
+      setQueryLength(querySnapshot.size);
+      if (querySnapshot.empty) {
+        setEmpty(true);
+      } else {
+        const requestsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setReqs(requestsData);
+      }
+    } catch (error) {
+      console.error('Error fetching requests:', error);
+      Alert.alert('Error', 'An error occurred while fetching requests.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchRequests();
+  };
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const requestsCollection = collection(Firebase_DB, 'Requests');
-        const querySnapshot = await getDocs(requestsCollection);
-
-        if (querySnapshot.empty) {
-          setEmpty(true);
-        } else {
-          const requestsData = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setReqs(requestsData);
-        }
-      } catch (error) {
-        console.error('Error fetching requests:', error);
-        Alert.alert('Error', 'An error occurred while fetching requests.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRequests();
   }, []);
 
-  const handleAccept = async requestId => {
+  const handleAccept = async (requestId) => {
     try {
       const docRef = doc(Firebase_DB, 'Requests', requestId);
       const docSnap = await getDoc(docRef);
@@ -72,8 +81,13 @@ const Requests = () => {
         'Request Accepted',
         'The request has been accepted successfully.',
       );
+      store.dispatch({
+        type: 'REQUESTS_REMOVE',payload : queryLength-1
+      });
+      setReqs((prevReqs) => {
 
-      setReqs(prevReqs => prevReqs.filter(req => req.id !== requestId));
+        return prevReqs.filter((req) => req.id !== requestId);
+      });
     } catch (error) {
       console.error('Error accepting request:', error);
       Alert.alert(
@@ -83,7 +97,7 @@ const Requests = () => {
     }
   };
 
-  const handleReject = async requestId => {
+  const handleReject = async (requestId) => {
     try {
       await deleteDoc(doc(RequestsCollection, requestId));
 
@@ -91,11 +105,15 @@ const Requests = () => {
         'Request Rejected',
         'The request has been rejected successfully.',
       );
+      store.dispatch({
+        type: 'REQUESTS_REMOVE',payload : queryLength-1
+      });
+      setReqs((prevReqs) => {
 
-      setReqs(prevReqs => prevReqs.filter(req => req.id !== requestId));
+        return prevReqs.filter((req) => req.id !== requestId);
+      });
     } catch (error) {
-      console.error('Error rejecting request:', error);
-      Alert.alert(
+      console.error('Error rejecting request:', error);      Alert.alert(
         'Error',
         'An error occurred while rejecting the request. Please try again.',
       );
@@ -120,8 +138,11 @@ const Requests = () => {
           <Text style={styles.emptyText}>Check back later</Text>
         </View>
       ) : (
-        <ScrollView>
-          {reqs.map(req => (
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          {reqs.map((req) => (
             <View style={styles.requestContainer} key={req.id}>
               <Text style={styles.requestText}>Name: {req.Fullname}</Text>
               <Text style={styles.requestText}>Email: {req.email}</Text>

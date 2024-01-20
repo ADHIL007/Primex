@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 
 const AnalyticsDatas = ({ count, countOfStaffs }) => {
   const numberOfSchoolsLabel = 'Number of Schools'; // Provide the label text here
@@ -34,13 +35,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   numberOfSchoolsLabel: {
-    fontSize: 18,
+    fontSize: RFPercentage(2.1),
     color: '#555',
     textAlign: 'center',
     marginBottom: 8,
   },
   numberOfSchools: {
-    fontSize: 36,
+    fontSize: RFPercentage(3.5),
     color: '#333',
     textAlign: 'center',
   },

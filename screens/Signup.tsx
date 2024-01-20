@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -20,27 +20,32 @@ const Signup = ({navigation}) => {
   const auth = Firebase_Auth;
 
   // List of schools for the dropdown
-const schools = [];
+  const [schools, setSchools] = useState([]);
+
 
 const getSchoolList = async () => {
-
   try {
     const querySnapshot = await getDocs(collection(Firebase_DB, 'Schools'));
-    storeData('SCHOOLLIST', querySnapshot);
+    const schoolsData = [];
+
     querySnapshot.forEach((doc) => {
       console.log(doc.id, ' => ', doc.data().schoolName);
-  schools.push(doc.data().schoolName);
-  storeData('SCHOOLS', schools);
+      schoolsData.push(doc.data().schoolName);
     });
 
-    // Concatenate the arrays to get a flat array
+    setSchools(schoolsData);
+    storeData('SCHOOLLIST', schoolsData);
+    storeData('SCHOOLS', schoolsData);
   } catch (error) {
     console.error('Error getting school list:', error);
   }
 };
 
-// Call the function to retrieve and log the school list
-getSchoolList();
+useEffect(() => {
+  // Call the function to retrieve and update the school list
+  getSchoolList();
+}, []);
+
 
 
   // // State variables
@@ -183,6 +188,8 @@ getSchoolList();
         <TextInput
           style={styles.input}
           placeholder="Password"
+          keyboardType='number-pad'
+
           secureTextEntry
           value={password}
           onChangeText={(text) => setPassword(text)}
@@ -195,6 +202,8 @@ getSchoolList();
           ]}
           placeholder="Confirm Password"
           secureTextEntry
+          keyboardType='number-pad'
+
           value={confirmPassword}
           onChangeText={(text) => checkConfirmPassword(text)}
           placeholderTextColor="#fff"
@@ -213,6 +222,7 @@ getSchoolList();
           dropdownStyle={styles.dropdown}
           rowStyle={styles.dropdownRow}
           rowTextStyle={styles.dropdownRowText}
+          onFocus={getSchoolList}
         />
       </View>
       <TouchableOpacity
