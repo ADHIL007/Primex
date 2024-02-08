@@ -10,7 +10,7 @@ const Logout = ({ navigation }) => {
       await AsyncStorage.clear();
 
       console.log('User logged out successfully');
-      navigation.replace('Login');
+      navigation.replace('LogoutAnime');
     } catch (error) {
       console.error('Error during logout:', error);
     }

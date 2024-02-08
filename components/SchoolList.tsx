@@ -16,12 +16,9 @@ const SchoolList = ({school, number}) => {
 
   return (
     <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: number % 2 === 0 ? '#ffffff' : '#f1f2f6',
-        },
-      ]}>
+      style={
+        styles.card
+      }>
       <View style={styles.rowContainer}>
         <Text style={styles.number}>{number}</Text>
         <Text style={styles.schoolName}>{school.schoolName}</Text>
@@ -50,7 +47,7 @@ const SchoolList = ({school, number}) => {
             style={[
               styles.details,
               {
-                backgroundColor: school.playground ? '#2ecc71' : '#fc5c65',
+                backgroundColor: school.playground ? '#0be881' : '#ff3f34',
                 padding: 5,
                 borderRadius: 10,
               },
@@ -61,7 +58,7 @@ const SchoolList = ({school, number}) => {
             style={[
               styles.details,
               {
-                backgroundColor: school.hasSchoolBus ? '#2ecc71' : '#fc5c65',
+                backgroundColor: school.hasSchoolBus ? '#0be881' : '#ff3f34',
                 padding: 5,
                 borderRadius: 10,
               },
@@ -104,6 +101,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(0,0,0,0.1)',
     padding: 14,
     width: '100%',
+    backgroundColor: '#fff',
   },
   rowContainer: {
     flexDirection: 'row',
@@ -150,12 +148,12 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   boys: {
-    backgroundColor: '#2d98da',
+    backgroundColor: '#0097e6',
     padding: 5,
     borderRadius: 10,
   },
   girls: {
-    backgroundColor: '#F875AA', // Adjust the color as needed
+    backgroundColor: '#e84393', // Adjust the color as needed
     padding: 5,
     borderRadius: 10,
   },
@@ -183,12 +181,12 @@ const styles = StyleSheet.create({
   },
   labFeature: {
     fontSize: RFPercentage(1.6),
-    backgroundColor: '#45aaf2',
+    backgroundColor: '#192a56',
     padding: 5,
     borderRadius: 10,
     color: '#fff',
     margin: 5,
-    elevation: 5,
+
   },
 });
 

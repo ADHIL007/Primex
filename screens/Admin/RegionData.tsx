@@ -54,17 +54,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    elevation: 5,
+    backgroundColor: '#4bcffa',
     alignItems: 'center',
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 10,
+    marginHorizontal: 10,
+    marginTop: 10,
+    borderRadius: 10,
+    elevation: 5,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 15,
+    color: '#fff',
+
   },
   infoContainer: {
     flexDirection: 'row',
@@ -77,12 +81,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#555',
+    color: '#fff',
     marginBottom: 5,
   },
   value: {
     fontSize: 34,
-    color: '#333',
+    color: '#fff',
   },
   schoolsContainer: {
     width: '100%',

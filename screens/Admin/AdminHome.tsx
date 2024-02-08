@@ -5,7 +5,6 @@ import {
   ScrollView,
   RefreshControl,
   Text,
-  TouchableOpacity,
   Alert,
 } from 'react-native';
 import FlatCardAdmin from '../../components/FlatCardAdmin';
@@ -14,38 +13,31 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { collection, getDocs } from 'firebase/firestore';
 import { storeData } from '../AsyncStorage';
-import { Firebase_Auth, Firebase_DB } from '../FirebaseConfig';
+import { Firebase_DB } from '../FirebaseConfig';
 import store from '../../Redux/Store';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 type AdminHomeProps = NativeStackScreenProps<RootStackParamList, 'AdminHome'>;
 
 const AdminHome = ({ navigation }: AdminHomeProps) => {
-  const [schools, setSchools] = useState<string[]>([]);
-  const [schoolCount, setSchoolCount] = useState(0);
-  const [reqs, setReqs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [empty, setEmpty] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
-
-
+  const [showAlert, setShowAlert] = useState(false);
 
   const getSchoolList = async () => {
     try {
       const querySnapshot = await getDocs(collection(Firebase_DB, 'Schools'));
-      storeData('SCHOOLS', querySnapshot.docs.map((doc) => doc.data()));
-      const schoolsData = querySnapshot.docs.map((doc) => doc.data().schoolName);
-      setSchools(schoolsData);
-      setSchoolCount(schoolsData.length);
+      storeData('SCHOOLS', querySnapshot.docs.map(doc => doc.data()));
+      const schoolsData = querySnapshot.docs.map(doc => doc.data().schoolName);
       store.dispatch({
         type: 'SCHOOL_COUNT',
-        payload: {
-          count: schoolsData.length,
-        },
+        payload: { count: schoolsData.length },
       });
       storeData('SCHOOLLIST', schoolsData);
     } catch (error) {
       console.error('Error getting school list:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,17 +45,14 @@ const AdminHome = ({ navigation }: AdminHomeProps) => {
     try {
       const requestsCollection = collection(Firebase_DB, 'Requests');
       const querySnapshot = await getDocs(requestsCollection);
-
       store.dispatch({
-        type :'REQUESTS',payload:{
-          count: querySnapshot.size
-        }
-      })
+        type: 'REQUESTS',
+        payload: { count: querySnapshot.size },
+      });
     } catch (error) {
       console.error('Error fetching requests:', error);
       Alert.alert('Error', 'An error occurred while fetching requests.');
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -73,25 +62,68 @@ const AdminHome = ({ navigation }: AdminHomeProps) => {
     fetchRequests();
   };
 
+
   useEffect(() => {
     getSchoolList();
+    setTimeout(() => {
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 2500); // Display alert for 2 seconds
+    }, 1000); // Display alert after 2 seconds
   }, []);
+
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-    >
-      <CountOfSchools  />
-      <FlatCardAdmin navigation={navigation} />
-    </ScrollView>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+        <CountOfSchools />
+        <FlatCardAdmin navigation={navigation} />
+      </ScrollView>
+      {showAlert && (
+        <View style={styles.alertContainer}>
+          <Text style={styles.alertText}>Refresh by swiping down</Text>
+          <MaterialIcons
+            name="swipe-down"
+            size={24}
+            color="#fff"
+            style={styles.swipeIcon}
+          />
+        </View>
+      )}
+    </View>
   );
 };
-
-export default AdminHome;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollView: {
+    flex: 1,
     backgroundColor: '#eee',
   },
+  alertContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  alertText: {
+    color: '#fff',
+    fontSize: 18,
+    marginRight: 10,
+  },
+  swipeIcon: {},
 });
+
+export default AdminHome;

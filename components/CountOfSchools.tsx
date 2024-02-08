@@ -1,25 +1,26 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
 import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getData } from '../screens/AsyncStorage';
 import store from '../Redux/Store';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 
 const CountOfSchools = () => {
-
+  // Access the SCHOOL_COUNT directly from the Redux store
+  const schoolCount = store.getState().SCHOOL_COUNT;
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../assets/Backgrounds/school.jpg')}
-        style={styles.bannerImage}
-      />
+      {/* Admin container */}
       <View style={styles.adminContainer}>
         <MaterialCommunityIcons name="account" color="#fff" size={24} />
         <Text style={styles.adminText}>Admin</Text>
       </View>
+
+      {/* Circle container */}
       <View style={styles.circleContainer}>
         <View style={styles.circle}>
-          <Text style={styles.text}>{store.getState().SCHOOL_COUNT}</Text>
+          {/* Display school count */}
+          <Text style={styles.text}>{schoolCount}</Text>
           <Text style={styles.schoolText}>Schools</Text>
         </View>
       </View>
@@ -27,27 +28,22 @@ const CountOfSchools = () => {
   );
 };
 
-export default CountOfSchools;
-
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  bannerImage: {
-    width: '100%',
-    height: 150,
-    resizeMode: 'cover',
   },
   adminContainer: {
     position: 'absolute',
     top: 20,
-    left: 20, // Adjust the left position as needed
+    left: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: '#1e272e',
     padding: 10,
     borderRadius: 20,
+    zIndex: 1, // Ensure admin container is above the circle container
   },
   adminText: {
     color: '#fff',
@@ -55,27 +51,29 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   circleContainer: {
-    position: 'absolute',
-    top: 100,
-    alignItems: 'center',
-  },
-  circle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#eee',
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 5, // Add elevation for a shadow effect
+  },
+  circle: {
+    height:220,
+    width:220,
+    borderRadius:125,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth:1,
+    borderColor:'#1e272e',
+    marginTop: 20,
   },
   text: {
-    color: '#333',
-    fontSize: 50,
-    fontWeight: 'bold',
+    color: '#1e272e', // Change text color to white
+    fontSize: RFPercentage(13.5),
+
   },
   schoolText: {
-    color: '#333',
-    fontSize: 16,
-    marginBottom: 5,
+    color: '#1e272e', // Change text color to white
+    fontSize: RFPercentage(4.5),
+    marginTop: 5, // Adjust margin for better spacing
   },
 });
+
+export default CountOfSchools;

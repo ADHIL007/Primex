@@ -13,6 +13,7 @@
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-native-community/checkbox": "^0.5.16",
     "@react-native-community/cli-doctor": "^12.0.0",
+    "@react-native-community/progress-bar-android": "^1.0.5",
     "@react-native-firebase/app": "^18.7.3",
     "@react-native-firebase/auth": "^18.7.3",
     "@react-native-firebase/database": "^18.7.3",
@@ -26,6 +27,7 @@
     "deprecated-react-native-prop-types": "^5.0.0",
     "eslint-plugin-disable": "^2.0.3",
     "firebase": "^10.7.1",
+    "lottie-react-native": "^6.6.0",
     "or": "^0.2.0",
     "patch-package": "^8.0.0",
     "react": "18.2.0",
@@ -41,6 +43,7 @@
     "react-native-select-dropdown": "^3.4.0",
     "react-native-svg": "^14.1.0",
     "react-native-vector-icons": "^10.0.3",
+    "react-redux": "^9.1.0",
     "yarn": "^1.22.21"
   },
   "devDependencies": {

@@ -8,10 +8,11 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import {Link} from '@react-navigation/native';
-
+import {ProgressBar} from '@react-native-community/progress-bar-android';
 import {addDoc, collection, query, where, getDocs} from 'firebase/firestore';
 import {getData, storeData} from './AsyncStorage';
 import {Firebase_Auth, Firebase_DB} from './FirebaseConfig';
@@ -152,38 +153,65 @@ useEffect(() => {
     setWrongPassword(password !== text);
   };
 
+  const [progressCount, setProgressCount] = useState(0);
+
+  useEffect(() => {
+    // Calculate progress based on the completion of fields
+    const progress = calculateProgress(username, email, phoneNumber, password, confirmPassword, selectedSchool);
+    setProgressCount(progress);
+  }, [username, email, phoneNumber, password, confirmPassword, selectedSchool]);
+
+  const calculateProgress = (username, email, phoneNumber, password, confirmPassword, selectedSchool) => {
+    // Calculate the completion of each field and sum them up
+    let completion = 0;
+    if (username !== '') completion += 1 / 6;
+    if (email !== '') completion += 1 / 6;
+    if (phoneNumber !== '') completion += 1 / 6;
+    if (password !== '') completion += 1 / 6;
+    if (confirmPassword !== '') completion += 1 / 6;
+    if (selectedSchool !== '') completion += 1 / 6;
+    return completion;
+  };
   return (
+    <ScrollView>
     <View style={styles.container}>
-      <Image
-        source={require('../assets/Backgrounds/desk.jpg')}
-        resizeMode="cover"
-        style={styles.backgroundImage}
-      />
-      <View style={styles.overlay}></View>
-      <Text style={styles.title}>Sign Up</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          value={username}
-          onChangeText={(text) => setUsername(text)}
-          placeholderTextColor="#fff"
+
+
+      <Text style={styles.title}>Get Started !</Text>
+      <ProgressBar
+          styleAttr="Horizontal"
+          indeterminate={false}
+          progress={progressCount}
+          color='#273c75'
+          style={{height: 20}}
         />
+      <View style={styles.inputContainer}>
+      <TextInput
+  style={styles.input}
+  placeholder="Full Name"
+  value={username}
+  onChangeText={(text) => {
+    setUsername(text);
+  }}
+  placeholderTextColor="#1e272e"
+/>
+
         <TextInput
           style={styles.input}
           placeholder="Email"
           keyboardType="email-address"
           value={email}
-          onChangeText={(text) => setEmail(text)}
-          placeholderTextColor="#fff"
+          onChangeText={(text) => {setEmail(text)}}
+          placeholderTextColor="#1e272e"
         />
         <TextInput
           style={styles.input}
           placeholder="Phone Number"
           value={phoneNumber}
-          onChangeText={(text) => setPhone(text)}
+          onChangeText={(text) => {setPhone(text)
+          }}
           inputMode="tel"
-          placeholderTextColor="#fff"
+          placeholderTextColor="#1e272e"
         />
         <TextInput
           style={styles.input}
@@ -193,20 +221,20 @@ useEffect(() => {
           secureTextEntry
           value={password}
           onChangeText={(text) => setPassword(text)}
-          placeholderTextColor="#fff"
+          placeholderTextColor="#1e272e"
         />
         <TextInput
           style={[
             styles.input,
-            { borderBottomColor: wrongPassword ? 'red' : '#fff' },
+            { borderBottomColor: wrongPassword ? 'red' : '#1e272e' },
           ]}
           placeholder="Confirm Password"
           secureTextEntry
           keyboardType='number-pad'
-
+defaultValue='ADC SCHOOL'
           value={confirmPassword}
           onChangeText={(text) => checkConfirmPassword(text)}
-          placeholderTextColor="#fff"
+          placeholderTextColor="#1e272e"
         />
         <SelectDropdown
           data={schools}
@@ -216,7 +244,7 @@ useEffect(() => {
           buttonTextAfterSelection={(selectedItem, index) => {
             return selectedItem;
           }}
-          defaultButtonText="Select School"
+
           buttonStyle={styles.dropdownButton}
           buttonTextStyle={styles.dropdownButtonText}
           dropdownStyle={styles.dropdown}
@@ -225,25 +253,26 @@ useEffect(() => {
           onFocus={getSchoolList}
         />
       </View>
+      <View style={styles.buttonCont}>
       <TouchableOpacity
         style={styles.signupButton}
         onPress={handleSignup}
         disabled={loading}
       >
         {loading ? (
-          <ActivityIndicator size="small" color="#00B8A9" />
+          <ActivityIndicator size="small" color="#1e272e" />
         ) : (
           <Text style={styles.buttonText}>Sign Up</Text>
         )}
       </TouchableOpacity>
       <View style={styles.linkCont}>
-        <Text style={{ color: '#fff', fontSize: 18 }}>
+        <Text style={{ color: '#1e272e', fontSize: 18 }}>
           Already have an Account
         </Text>
         <Link
           to={{ screen: 'Login' }}
           style={{
-            color: '#00B8A9',
+            color: '#05c46b',
             fontSize: 18,
             fontStyle: 'italic',
           }}
@@ -252,86 +281,83 @@ useEffect(() => {
         </Link>
       </View>
     </View>
+    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+padding:20
+  },
+  buttonCont:{
     alignItems: 'center',
-    position: 'relative',
-  },
-  backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: undefined,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   title: {
-    fontSize: 44,
+    fontSize: 54,
     fontWeight: 'bold',
     marginBottom: 30,
-    color: '#00B8A9',
+    color: '#1e272e',
     zIndex: 1,
   },
   inputContainer: {
-    width: '80%',
+    width: '98%',
     marginBottom: 20,
     zIndex: 1,
+marginTop:20
   },
   input: {
-    height: 50,
-    borderBottomWidth: 1,
-    borderBottomColor: '#fff',
-    marginBottom: 20,
-    fontSize: 16,
-    color: '#fff',
+    borderWidth: 1,
+    borderColor: '#1e272e',
+    color: '#1e272e',
+    fontSize: 23,
+    marginBottom: 10,
+    padding: 10,
+    borderRadius: 5,
     backgroundColor: 'transparent',
+    height: 70,
   },
   dropdownButton: {
     backgroundColor: 'transparent',
-    color: '#fff',
+    color: '#1e272e',
     padding: 8,
     marginTop: 20,
     borderWidth: 1,
-    borderColor: '#fff',
-    width: 340,
+    borderColor: '#1e272e',
+    width: '98%',
     fontSize: 18,
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+
   },
   dropdownButtonText: {
-    color: '#fff',
+    color: '#1e272e',
     fontWeight: 'bold',
   },
   dropdown: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'rgb(255, 255, 255)',
     borderRadius:10
 
   },
   dropdownRow: {
     padding: 12,
-    borderBottom: '1px solid transparent',
   },
   dropdownRowText: {
-    color: '#333',
+    color: '#1e272e',
     textAlign: 'center',
     fontSize: 16,
   },
   signupButton: {
     borderWidth: 2,
-    borderColor: '#00B8A9',
+    borderColor: '#1e272e',
     padding: 15,
-    width: '80%',
+    width: '50%',
     borderRadius: 5,
     marginTop: 30,
     backgroundColor: 'transparent',
+    zIndex: 1, // Place it above the overlay
   },
   buttonText: {
-    color: '#00B8A9',
+    color: '#1e272e',
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 16,

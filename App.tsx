@@ -15,6 +15,7 @@ import RepresentativeList from './screens/Admin/RepresentativeList';
 import RecentActivity from './screens/Admin/RecentActivity';
 import AddSchool from './screens/Admin/AddSchool';
 import ManageSchool from './screens/Admin/ManageSchool'
+import LogoutAnime from './screens/LogoutAnime';
 
 
 export type RootStackParamList = {
@@ -35,6 +36,7 @@ export type RootStackParamList = {
   RecentActivity: undefined;
   AddSchool:undefined;
   ManageSchool: undefined;
+  LogoutAnime: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -84,6 +86,13 @@ const App = (): JSX.Element => {
         <Stack.Screen
           name="Admin"
           component={Admin}
+          options={{
+            headerShown: false,
+          }}
+        />
+          <Stack.Screen
+          name="LogoutAnime"
+          component={LogoutAnime}
           options={{
             headerShown: false,
           }}

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {RadioButton} from 'react-native-paper';
 import {
   StyleSheet,
@@ -8,127 +8,141 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  ActivityIndicator, // Added ActivityIndicator for loading feedback
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  PermissionsAndroid,
+  ScrollView,
 } from 'react-native';
 import {Link, useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../App';
-
+import {Vibration} from 'react-native';
 import {signInWithEmailAndPassword} from 'firebase/auth';
 import {Firebase_Auth} from './FirebaseConfig';
 import {storeData} from './AsyncStorage';
-
+import LottieView from 'lottie-react-native';
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const Login = ({navigation}: LoginProps) => {
   const auth = Firebase_Auth;
-
+  const [loginStatus, setLoginStatus] = useState(false);
   const [userid, setUserid] = useState('');
   const [password, setPassword] = useState('');
-  const [checked, setChecked] = useState('Rep');
   const [loading, setLoading] = useState(false); // Added loading state
+  useEffect(() => {
+    // Check login status and redirect accordingly
+    if (loginStatus) {
+      if(userid==='Admin'){
+        setTimeout(() => {
+          navigation.replace('Admin');
+         },5500)
+      }else{
+        setTimeout(() => {
+          navigation.replace('Home');
+         },5500)
+      }
 
-  const handleLogin = () => {
+
+
+    }
+  }, [loginStatus, navigation]);
+
+  const handleLogin = async () => {
     setLoading(true); // Set loading to true when login starts
-console.log('Login reached');
+    console.log('Login reached');
 
-    if (checked === 'admin') {
-      const admin = {
-        userid: '',
-        password: '',
-      };
+    const admin = {
+      userid: 'Admin',
+      password: '123',
+    };
 
-      if (userid === admin.userid && password === admin.password) {
-        navigation.replace('Admin');
+    if (userid === admin.userid && password === admin.password) {
+      // For admin login
+      storeData('USERSTATUS', true);
+      storeData('USERID', 'ADMIN');
+      setLoginStatus(true);
+    } else if (userid !== '' && password !== '') {
+      // For regular user login
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, userid, password);
+        console.log('User logged in successfully:', userCredential);
         storeData('USERSTATUS', true);
-          storeData('USERID', 'ADMIN');
-      } else {
+        storeData('USERID', 'USER');
+        setLoginStatus(true);
+      } catch (error) {
         setLoading(false); // Reset loading on login failure
-        console.log('Incorrect admin credentials');
+        console.log('Error', error);
+        Alert.alert(error.message);
       }
     } else {
-      signInWithEmailAndPassword(auth, userid, password)
-        .then(userCredential => {
-          console.log('User logged in successfully:', userCredential);
-          storeData('USERSTATUS', true);
-          storeData('USERID','USER');
-          navigation.replace('Home');
-        })
-        .catch(error => {
-          setLoading(false); // Reset loading on login failure
-          console.log('Error', error);
-          Alert.alert(error);
-        });
+      Alert.alert('Please enter username and password');
+
     }
   };
 
+
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../assets/Backgrounds/Asiankidsreading.jpg')}
-        resizeMode="cover"
-        style={styles.backgroundImage}
+    <>
+
+      {loginStatus ? (
+        <View style={styles.lottiecontainer}>
+          <LottieView source={require('../assets/gifs/Loginsuccess.json')} autoPlay loop style={{flex: 1,width: 600, height: 600}} />
+       <Text style={styles.lottieText}>Login SuccessFull</Text>
+       <Text style={[styles.lottieText, {fontSize: 30,top: "70%"}]}>Redirecting...</Text>
+        </View>
+      ) : (
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome Back!</Text>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="User ID or email"
+              placeholderTextColor={styles.placeholder.color}
+              autoFocus={false}
+              value={userid}
+              onChangeText={text => setUserid(text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry={true}
+              placeholderTextColor={styles.placeholder.color}
+              value={password}
+              onChangeText={text => setPassword(text)}
+            />
+          </View>
+          <View style={styles.buttonCont}>
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              {loading ? (
+                <ActivityIndicator color="#1e272e" size="small" /> // Show loading indicator
+              ) : (
+                <Text style={styles.buttonText}>Login</Text>
+              )}
+            </TouchableOpacity>
+            <View style={styles.linkCont}>
+              <Text style={{color: '#1e272e', fontSize: 18}}>
+                Don't Have an Account
+              </Text>
+              <Link
+                to={{screen: 'Signup'}}
+                style={{color: '#05c46b', fontSize: 18, fontStyle: 'italic'}}>
+                Sign up now
+              </Link>
+            </View>
+          </View>
+
+      <LottieView
+        source={require('../assets/gifs/Login.json')}
+        autoPlay
+        loop
+        style={styles.lottCont}
       />
-      <View style={styles.overlay}></View>
-      <Text style={styles.title}>Login</Text>
-      <View style={styles.RadCont}>
-        <View style={styles.radioButtonContainer}>
-          <RadioButton
-            value="Rep"
-            status={checked === 'Rep' ? 'checked' : 'unchecked'}
-            onPress={() => setChecked('Rep')}
-            color="#00B8A9"
-          />
-          <Text style={styles.radioButtonLabel}>Representative</Text>
-        </View>
-        <View style={styles.radioButtonContainer}>
-          <RadioButton
-            value="admin"
-            status={checked === 'admin' ? 'checked' : 'unchecked'}
-            onPress={() => setChecked('admin')}
-            color="#00B8A9"
-          />
-          <Text style={styles.radioButtonLabel}>Admin</Text>
-        </View>
-      </View>
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="User ID or email"
-          placeholderTextColor={styles.placeholder.color}
-          autoFocus={true}
-          value={userid}
-          onChangeText={text => setUserid(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry={true}
-          placeholderTextColor={styles.placeholder.color}
-          value={password}
-          onChangeText={text => setPassword(text)}
-        />
-      </View>
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        {loading ? (
-          <ActivityIndicator color="#00B8A9" size="small" /> // Show loading indicator
-        ) : (
-          <Text style={styles.buttonText}>Login</Text>
-        )}
-      </TouchableOpacity>
-
-      <View style={styles.linkCont}>
-        <Text style={{color: 'white', fontSize: 18}}>
-          Don't Have an Account
-        </Text>
-        <Link
-          to={{screen: 'Signup'}}
-          style={{color: '#00B8A9', fontSize: 18, fontStyle: 'italic'}}>
-          Sign up now
-        </Link>
-      </View>
-    </View>
+        </View>
+      )}
+    </>
   );
 };
 
@@ -138,25 +152,34 @@ const styles = StyleSheet.create({
     position: 'relative',
     height: '100%',
     width: '100%',
+    padding: 20,
+  },
+  lottiecontainer:{
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'column',
   },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
+  lottieText:{
     position: 'absolute',
-    top: 0,
-    bottom: 0,
+    top:'65%',
+fontSize: 40,
+color: '#1e272e',
+
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adjust the opacity as needed
+  lottCont: {
+    flex: 1,
+
+  },
+
+  buttonCont: {
+    alignItems: 'center',
   },
   title: {
     fontSize: 44,
     fontWeight: 'bold',
-    color: '#00B8A9',
-    marginBottom: 30,
+    color: '#1e272e',
+    marginBottom: 40,
     zIndex: 1, // Place it above the overlay
   },
   radioButtonContainer: {
@@ -166,44 +189,44 @@ const styles = StyleSheet.create({
   },
   RadCont: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20, // Adjusted margin
   },
   radioButtonLabel: {
     marginLeft: 10,
     fontSize: 18,
-    color: '#00B8A9',
+    color: '#1e272e',
   },
   inputContainer: {
-    width: '80%',
+    width: '98%',
     marginBottom: 10, // Adjusted margin
     zIndex: 1, // Place it above the overlay
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    color: '#eee',
+    borderWidth: 1,
+    borderColor: '#1e272e',
+    color: '#1e272e',
+    fontSize: 23,
     marginBottom: 10,
     padding: 10,
     borderRadius: 5,
     backgroundColor: 'transparent',
+    height: 70,
   },
   placeholder: {
-    color: '#eee',
+    color: '#1e272e',
+    opacity: 0.5,
   },
   loginButton: {
     borderWidth: 2,
-    borderColor: '#00B8A9',
+    borderColor: '#1e272e',
     padding: 15,
-    width: '80%',
+    width: '50%',
     borderRadius: 5,
     marginTop: 30,
     backgroundColor: 'transparent',
     zIndex: 1, // Place it above the overlay
   },
   buttonText: {
-    color: '#00B8A9',
+    color: '#1e272e',
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 16,
