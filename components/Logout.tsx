@@ -1,8 +1,8 @@
 import React from 'react';
-import { View,  StyleSheet ,Image, TouchableOpacity} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
+import { RFPercentage } from 'react-native-responsive-fontsize';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 const Logout = ({ navigation }) => {
   const handleLogout = async () => {
     try {
@@ -18,8 +18,9 @@ const Logout = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handleLogout} style ={styles.button}>
-        <Image source={require('../assets/graphics/logout.png')} style ={styles.image}/>
+      <TouchableOpacity onPress={handleLogout} style={styles.button}>
+        <Text style={{ color: '#fff' ,fontSize: RFPercentage(2.9)}}>Logout</Text>
+      <MaterialCommunityIcons name="logout" color="#fff" size={RFPercentage(2.9)} />
       </TouchableOpacity>
     </View>
   );
@@ -27,21 +28,18 @@ const Logout = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
     padding: 16,
   },
-  button :{
-width :40,
-height:40
+  button: {
+    width: 150,
+    height: 60,
+    borderRadius: 10,
+    backgroundColor: '#0fbcf9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 5,
   },
-  image :{
-    width :'100%',
-height:'100%'
-  }
-
-
 });
 
 export default Logout;

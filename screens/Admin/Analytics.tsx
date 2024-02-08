@@ -149,7 +149,7 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <Image
-            source={require('../../assets/Backgrounds/bear.png')}
+            source={require('../../assets/Backgrounds/bear-playing.png')}
             style={styles.image}
           />
           <Text style={styles.message}>Loading...</Text>

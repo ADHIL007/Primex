@@ -67,8 +67,8 @@ const Main = ({navigation}: MainProps) => {
             style={styles.emptyImage}
             source={
               response !== 'true'
-                ? require('../assets/Backgrounds/sadcat.png')
-                : require('../assets/Backgrounds/happycat.png')
+                ? require('../assets/Backgrounds/bear-sleeping.png')
+                : require('../assets/Backgrounds/bear-playing.png')
             }
           />
           <Text style={styles.emptyText}>

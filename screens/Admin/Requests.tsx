@@ -179,8 +179,8 @@ const Requests = () => {
 
 const styles = StyleSheet.create({
   emptyImage: {
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     marginBottom: 20,
     borderRadius: 10,
     overflow: 'hidden',
