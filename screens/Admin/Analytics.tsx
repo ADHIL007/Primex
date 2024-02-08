@@ -145,11 +145,7 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
   }, []);
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }>
+    <>
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <Image
@@ -164,14 +160,20 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
           />
         </View>
       ) : (
-        <>
+        <ScrollView
+          style={styles.container}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <PieCharts data={regionData} />
           <AnalyticsDatas count={totalSchools} countOfStaffs={totalStaffs} />
           <RegionCards navigation={navigation} schoolData={regionData} />
-        </>
+        </ScrollView>
       )}
-    </ScrollView>
+    </>
   );
+
 };
 
 const styles = StyleSheet.create({
