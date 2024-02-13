@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 import PieCharts from '../../components/PieCharts';
-import AnalyticsDatas from '../../components/AnalyticsDatas';
+import AnalyticsDatas from './AnalyticsDatas';
 import RegionCards from '../../components/RegionCards';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';

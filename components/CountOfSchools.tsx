@@ -15,14 +15,18 @@ const CountOfSchools = () => {
         <MaterialCommunityIcons name="account" color="#fff" size={24} />
         <Text style={styles.adminText}>Admin</Text>
       </View>
-
       {/* Circle container */}
       <View style={styles.circleContainer}>
+        {/* Left semicircle */}
+        <View style={styles.semicircleContainer}></View>
+        {/* Circle */}
         <View style={styles.circle}>
           {/* Display school count */}
           <Text style={styles.text}>{schoolCount}</Text>
           <Text style={styles.schoolText}>Schools</Text>
         </View>
+        {/* Right semicircle */}
+        <View style={styles.semicircleContainer}></View>
       </View>
     </View>
   );
@@ -33,6 +37,25 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 0.5,
+    height: 200,
+    borderColor: '#1e272e',
+  },
+  majorcircleContainer:{
+    display:'flex',
+    flexDirection:'row',
+
+  },
+  semicircleContainer:{
+    height:80,
+    width:80,
+    borderRadius:125,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth:0.5,
+    borderColor:'#1e272e',
+    marginHorizontal: 10, // Add margin horizontally
+    marginTop: 90,
   },
   adminContainer: {
     position: 'absolute',
@@ -47,32 +70,32 @@ const styles = StyleSheet.create({
   },
   adminText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: RFPercentage(2.5),
     marginLeft: 5,
   },
   circleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row', // Align items horizontally
   },
   circle: {
-    height:220,
-    width:220,
+    height:160,
+    width:160,
     borderRadius:125,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth:1,
+    borderWidth:0.5,
     borderColor:'#1e272e',
     marginTop: 20,
   },
   text: {
     color: '#1e272e', // Change text color to white
-    fontSize: RFPercentage(13.5),
-
+    fontSize: RFPercentage(10.5),
+    fontFamily: 'Railway',
   },
   schoolText: {
     color: '#1e272e', // Change text color to white
-    fontSize: RFPercentage(4.5),
-    marginTop: 5, // Adjust margin for better spacing
+    fontSize: RFPercentage(3),
   },
 });
 

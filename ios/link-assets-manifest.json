@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/Fonts/Quicksand-VariableFont_wght.ttf",
+      "sha1": "17fb514f853cfeb7176a384fa29358e9c4b76c39"
+    },
+    {
+      "path": "assets/Fonts/Raleway-Italic-VariableFont_wght.ttf",
+      "sha1": "3457d286484db77b96f585866f758dfa13690b05"
+    },
+    {
+      "path": "assets/Fonts/Raleway-VariableFont_wght.ttf",
+      "sha1": "51419d139ba96d998486bc58ba70a69fb9fd7947"
+    }
+  ]
+}

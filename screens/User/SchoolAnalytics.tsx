@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import Linechart from './Linechart'
 
 const SchoolAnalytics = () => {
   return (
     <View>
-      <Text>SchoolAnalytics</Text>
+      <Linechart/>
     </View>
   )
 }
