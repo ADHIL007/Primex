@@ -8,7 +8,7 @@ type LogoutAnime = NativeStackScreenProps<RootStackParamList, 'LogoutAnime'>;
 const LogoutAnime = ({navigation}) => {
     setTimeout(() => {
       navigation.replace('Login');
-    },3500)
+    },2500)
   return (
     <View style={styles.cont}>
       <LottieView source={require('../assets/gifs/Logout.json')} autoPlay loop  style={{flex:1,top:180}}/>

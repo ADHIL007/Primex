@@ -2,7 +2,7 @@ export default function reducer(
     state = {
       loginStatus: false,
       SCHOOL_LIST: {},
-      USER: {},
+      USER: '',
       USER_LIST: {},
       REQUESTS: {}, // Updated to an object to store more information
       SCHOOL_COUNT: 0,
@@ -10,6 +10,9 @@ export default function reducer(
       R2: [],
       R3: [],
       R4: [],
+      CurrentSchool: '',
+      CurrentSchoolData: [],
+      CurrentUserdata :[],
     },
     action,
   ) {
@@ -41,6 +44,13 @@ export default function reducer(
         return { ...state, R3: action.payload };
       case 'R4':
         return { ...state, R4: action.payload };
+        case 'CURRENT_SCHOOL':
+          return { ...state, CurrentSchool: action.payload };
+        case 'CURRENT_SCHOOL_DATA':
+          return { ...state, CurrentSchoolData: action.payload };
+        case 'CURRENT_USER_DATA':
+          return { ...state, CurrentUserdata: action.payload };
+
       default:
         return state;
     }

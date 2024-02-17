@@ -27,6 +27,7 @@ const Main = ({navigation}: MainProps) => {
       console.log('Response:', result, 'Type:', typeof result);
       console.log('User ID:', userId, 'Type:', typeof userId);
 
+
       if (result !== null && userId !== null) {
         // If user status and ID are not null
         setTimeout(() => {

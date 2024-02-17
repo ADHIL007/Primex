@@ -5,4 +5,4 @@ const store = createStore(reducer);
 
 export default store;
 
-store.subscribe(() => console.log("Store updated: ", store.getState().REQUESTS)); // Log the updated store state
+store.subscribe(() => console.log("Store updated: ", store.getState().CurrentSchoolData)); // Log the updated store state

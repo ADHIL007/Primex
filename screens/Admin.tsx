@@ -1,10 +1,7 @@
 import { StyleSheet, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import AdminNavigationTab from './Admin/AdminNavigationTab';
-import store from '../Redux/Store';
-import { collection, getDocs } from 'firebase/firestore';
-import { Firebase_DB } from './FirebaseConfig';
-import { Provider } from 'react-redux';
+
 
 const Admin = () => {
 

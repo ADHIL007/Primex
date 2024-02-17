@@ -1,20 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import React  from 'react';
+import { View ,StyleSheet} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
-import { getData } from '../AsyncStorage';
 import FlatCard from '../../components/FlatCard';
-import Horizontal from '../../components/Horizontal';
-import Logout from '../../components/Logout';
-import AdminNavigationTab from '../Admin/AdminNavigationTab';
+import TopBanner from './TopBanner';
+
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const Home = ({ navigation }: HomeProps) => {
-  console.log(' reached');
+
   return (
     <View style={styles.container}>
-
+<TopBanner />
      <FlatCard />
 
 
@@ -28,6 +26,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-    backgroundColor: '#eee',
+    backgroundColor: '#ecf0f1',
   },
 });

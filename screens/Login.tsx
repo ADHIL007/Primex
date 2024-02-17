@@ -22,6 +22,7 @@ import {signInWithEmailAndPassword} from 'firebase/auth';
 import {Firebase_Auth} from './FirebaseConfig';
 import {storeData} from './AsyncStorage';
 import LottieView from 'lottie-react-native';
+import store from '../Redux/Store';
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const Login = ({navigation}: LoginProps) => {
@@ -30,56 +31,54 @@ const Login = ({navigation}: LoginProps) => {
   const [userid, setUserid] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // Added loading state
-  useEffect(() => {
-    // Check login status and redirect accordingly
-    if (loginStatus) {
-      if(userid==='Admin'){
-        setTimeout(() => {
-          navigation.replace('Admin');
-         },5500)
-      }else{
-        setTimeout(() => {
-          navigation.replace('Home');
-         },5500)
-      }
 
-
-
-    }
-  }, [loginStatus, navigation]);
 
   const handleLogin = async () => {
     setLoading(true); // Set loading to true when login starts
     console.log('Login reached');
 
     const admin = {
-      userid: 'Admin',
-      password: '123',
+        userid: 'Admin',
+        password: '123',
     };
+    console.log('Provided credentials:', userid, password); // Log provided credentials
 
-    if (userid === admin.userid && password === admin.password) {
-      // For admin login
-      storeData('USERSTATUS', true);
-      storeData('USERID', 'ADMIN');
-      setLoginStatus(true);
-    } else if (userid !== '' && password !== '') {
-      // For regular user login
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, userid, password);
-        console.log('User logged in successfully:', userCredential);
+    if (admin.userid === userid && admin.password === password) {
+        // For admin login
+        console.log('Admin login attempt:', userid, password); // Log admin login attempt
         storeData('USERSTATUS', true);
-        storeData('USERID', 'USER');
+        storeData('USERID', 'ADMIN');
         setLoginStatus(true);
-      } catch (error) {
-        setLoading(false); // Reset loading on login failure
-        console.log('Error', error);
-        Alert.alert(error.message);
-      }
-    } else {
-      Alert.alert('Please enter username and password');
+        console.log('Admin logged in successfully');
+        setTimeout(() => {
+            navigation.replace('Admin');
+        }, 5500);
+    } else if (userid !== admin.userid && userid !== '' && password !== '') {
+        // For regular user login
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, userid, password);
+            console.log('User logged in successfully:', userCredential);
+            storeData('USERSTATUS', true);
+            storeData('USERID', userid);
+            console.log(userCredential);
 
+            setLoginStatus(true);
+            setTimeout(() => {
+                navigation.replace('Home');
+            }, 5500);
+            store.dispatch({
+                type: 'USER',
+                payload: userid
+            });
+        } catch (error) {
+            setLoading(false); // Reset loading on login failure
+            console.log('Error', error);
+            Alert.alert(error.message);
+        }
+    } else {
+        Alert.alert('Please enter username and password');
     }
-  };
+};
 
 
   return (
