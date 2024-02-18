@@ -19,6 +19,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { Firebase_DB } from '../FirebaseConfig';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 
 
 const Dots = ({currentSlide, totalSlides}) => {
@@ -31,7 +32,7 @@ const Dots = ({currentSlide, totalSlides}) => {
             styles.dot,
             {
               backgroundColor:
-                currentSlide >= index ? '#4CB9E7' : 'transparent',
+                currentSlide >= index ? '#1e272e' : 'transparent',
             },
           ]}
         />
@@ -200,6 +201,7 @@ const AddSchool = ({navigation}: any) => {
     },
     hasSchoolBus: false,
     playground: false,
+    prevpass :[]
   });
 
   const handleNext = () => {
@@ -290,7 +292,7 @@ navigation.replace('AddSchool');
 
     return (
       <View style={styles.container}>
-        <Text style={styles.headText}>Add School</Text>
+        <Text style={styles.headText}>Enroll a new school</Text>
         <Dots currentSlide={slide} totalSlides={slides.length} />
         <View style={styles.slideView}>
           {slides[slide]({ formData, setFormData })}
@@ -318,7 +320,7 @@ navigation.replace('AddSchool');
                 styles.navigateBtn,
                 {
                   width: slide === 0 ? 300 : 150,
-                  backgroundColor: slide === 2 ? '#6ACAFC' : '#50D890',
+                  backgroundColor: slide === 2 ? '#1e272e' : '#50D890',
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -352,10 +354,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headText: {
-    color: '#4CB9E7',
+    color: '#1e272e',
     fontWeight: 'bold',
-    fontSize: 40,
+    fontSize: RFPercentage(6),
     padding: 20,
+    fontFamily: 'Raleway',
   },
   slideView: {
     width: '100%',
@@ -369,9 +372,10 @@ const styles = StyleSheet.create({
   },
   Pickerinput: {
     marginTop: 20,
-    height: 40,
+    height: 70,
+
     borderColor: '#333',
-    backgroundColor: '#4CB9E7',
+    backgroundColor: '#1e272e',
     width: '100%',
   },
   navigateBtn: {
@@ -408,14 +412,16 @@ const styles = StyleSheet.create({
     color: '#333333',
   },
   input: {
-    height: 40,
-    borderColor: '#333',
-    borderBottomWidth: 1,
+    borderWidth: 1,
+    borderColor: '#1e272e',
+    color: '#1e272e',
+    fontSize: 23,
     marginBottom: 10,
-    paddingLeft: 10,
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: 'transparent',
+    height: 70,
     width: '100%',
-    borderRadius: 8,
-    color: '#333',
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -435,12 +441,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 5,
+    width: 15,
+    height: 15,
+    borderRadius: 7.5,
     margin: 5,
     borderWidth: 1,
-    borderColor: '#4CB9E7',
+    borderColor: '#1e272e',
+    backgroundColor: '#1e272e',
   },
 });
 

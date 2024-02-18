@@ -1,11 +1,12 @@
 import React from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-const FlatCard = () => {
+const FlatCard = ({navigation}) => {
   return (
-    <TouchableOpacity style={styles.outerContainer}>
-      <TouchableOpacity style={styles.container}>
-        <TouchableOpacity style={[styles.card, styles.cardOne]}>
+    <View style={styles.outerContainer}>
+      <View style={styles.container}>
+        <TouchableOpacity style={[styles.card, styles.cardOne]} onPress={
+          ()=>{navigation.navigate('Analytics')}}>
           <Image
             source={require('../assets/graphics/statistics.png')}
             style={styles.image1}
@@ -13,9 +14,11 @@ const FlatCard = () => {
           />
           <Text style={styles.cardText}>Analytics</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.columnCont}>
+        <View style={styles.columnCont}>
           <TouchableOpacity
-            style={[styles.card, styles.cardTwo, styles.columnTile]}>
+            style={[styles.card, styles.cardTwo, styles.columnTile]}
+            onPress={
+              ()=>{navigation.navigate('UpdateData')}}>
             <Image
               source={require('../assets/graphics/checklist.png')}
               style={styles.image2}
@@ -36,9 +39,9 @@ const FlatCard = () => {
               Recent Activity
             </Text>
           </TouchableOpacity>
-        </TouchableOpacity>
-      </TouchableOpacity>
-    </TouchableOpacity>
+        </View>
+      </View>
+    </View>
   );
 };
 

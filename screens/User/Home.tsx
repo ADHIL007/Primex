@@ -13,7 +13,7 @@ const Home = ({ navigation }: HomeProps) => {
   return (
     <View style={styles.container}>
 <TopBanner />
-     <FlatCard />
+     <FlatCard navigation={navigation} />
 
 
     </View>

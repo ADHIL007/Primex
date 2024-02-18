@@ -16,6 +16,8 @@ import RecentActivity from './screens/Admin/RecentActivity';
 import AddSchool from './screens/Admin/AddSchool';
 import ManageSchool from './screens/Admin/ManageSchool'
 import LogoutAnime from './screens/LogoutAnime';
+import SchoolAnalytics from './screens/User/SchoolAnalytics';
+import UpdateData from './screens/User/UpdateData';
 
 
 export type RootStackParamList = {
@@ -37,6 +39,9 @@ export type RootStackParamList = {
   AddSchool:undefined;
   ManageSchool: undefined;
   LogoutAnime: undefined;
+  UserAnalatics: undefined
+  UpdateData : undefined
+  UserRecentActivity : undefined
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

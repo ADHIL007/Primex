@@ -24,6 +24,7 @@
     "@react-navigation/native-stack": "^6.9.17",
     "@reduxjs/toolkit": "^2.0.1",
     "@rneui/themed": "^4.0.0-rc.8",
+    "@tensorflow/tfjs-react-native": "^1.0.0",
     "add": "^2.0.6",
     "deprecated-react-native-prop-types": "^5.0.0",
     "eslint-plugin-disable": "^2.0.3",

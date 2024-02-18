@@ -13,6 +13,7 @@ export default function reducer(
       CurrentSchool: '',
       CurrentSchoolData: [],
       CurrentUserdata :[],
+      prevpass :[]
     },
     action,
   ) {
@@ -50,6 +51,16 @@ export default function reducer(
           return { ...state, CurrentSchoolData: action.payload };
         case 'CURRENT_USER_DATA':
           return { ...state, CurrentUserdata: action.payload };
+          case 'PREVPASS':
+            return { ...state, prevpass: action.payload };
+            case 'PushPrevPass':
+              return {
+                ...state,
+                CurrentSchoolData: {
+                  ...state.CurrentSchoolData,
+                  prevpass: action.payload
+                }
+              };
 
       default:
         return state;
