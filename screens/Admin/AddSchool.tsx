@@ -185,7 +185,9 @@ const AddSchool = ({navigation}: any) => {
   const slides = [FirstSlide, SecondSlide, ThirdSlide];
   const [slide, setSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
+
+
+const [formData, setFormData] = useState({
     schoolName: '',
     location: '',
     region: 'R1', // e.g., Region 1, Region 2, ...
@@ -193,101 +195,108 @@ const AddSchool = ({navigation}: any) => {
     boys: '',
     girls: '',
     labFeatures: {
-      biologyLab: false,
-      chemistryLab: false,
-      physicsLab: false,
-      computerLab: false,
-      electronicsLab: false,
+        biologyLab: false,
+        chemistryLab: false,
+        physicsLab: false,
+        computerLab: false,
+        electronicsLab: false,
     },
     hasSchoolBus: false,
     playground: false,
-    prevpass :[]
-  });
+    prevpass: [],
+    totalTests: [],
+    averageMathGrade: [],
+    averageScienceGrade: [],
+    averageEnglishGrade: [],
+    averageAttendance: [],
+    rating: 0
+});
 
-  const handleNext = () => {
+// Function to calculate and update the rating
+
+const handleNext = () => {
     if (slide < slides.length - 1) {
-      setSlide(slide + 1);
+        setSlide(slide + 1);
     }
-  };
+};
 
-  const handlePrevious = () => {
+const handlePrevious = () => {
     if (slide > 0) {
-      setSlide(slide - 1);
+        setSlide(slide - 1);
     }
-  };
-  const handleSubmission = async () => {
+};
 
+const handleSubmission = async () => {
     try {
-      setIsLoading(true);
-      // Check if any required field in formData is empty
-      const requiredFields = [
-        'schoolName',
-        'location',
-        'numberOfStaffs',
-        'boys',
-        'girls',
-      ];
+        setIsLoading(true);
+        // Check if any required field in formData is empty
+        const requiredFields = [
+            'schoolName',
+            'location',
+            'numberOfStaffs',
+            'boys',
+            'girls',
+        ];
 
-      for (const key of requiredFields) {
-        if (formData[key] === '' || formData[key] === null) {
-          Alert.alert(
-            'Incomplete Form',
-            'Please fill out all required fields before submitting.',
-          );
-          return;
+        for (const key of requiredFields) {
+            if (formData[key] === '' || formData[key] === null) {
+                Alert.alert(
+                    'Incomplete Form',
+                    'Please fill out all required fields before submitting.',
+                );
+                return;
+            }
         }
-      }
 
-      const dbCollection = collection(Firebase_DB, 'Schools');
+        const dbCollection = collection(Firebase_DB, 'Schools');
 
-      // Check if a document with the same schoolName already exists
-      const schoolNameQuery = query(
-        dbCollection,
-        where('schoolName', '==', formData.schoolName),
-      );
-      const matchingDocs = await getDocs(schoolNameQuery);
-
-      if (matchingDocs.size > 0) {
-        // If a document with the same schoolName exists, show an alert and don't proceed
-        Alert.alert(
-          'School Name Already Exists',
-          'Please choose a different school name. If you wish to edit the school, please go to Manage Schools.',
-          [
-            {
-              text: 'OK',
-              style: 'cancel',
-            },
-            {
-              text: 'Manage Schools',
-              onPress: () => {
-                // Navigate to the 'ManageSchool' screen
-                // Replace 'ManageSchool' with the actual screen name in your navigation setup
-                // This assumes you're using React Navigation
-                navigation.navigate('ManageSchool');
-              },
-            },
-          ],
+        // Check if a document with the same schoolName already exists
+        const schoolNameQuery = query(
+            dbCollection,
+            where('schoolName', '==', formData.schoolName),
         );
-        return;
-      }
+        const matchingDocs = await getDocs(schoolNameQuery);
 
-      // If all required fields are entered and the schoolName is unique, add the document to the collection
-      await addDoc(dbCollection, formData);
+        if (matchingDocs.size > 0) {
+            // If a document with the same schoolName exists, show an alert and don't proceed
+            Alert.alert(
+                'School Name Already Exists',
+                'Please choose a different school name. If you wish to edit the school, please go to Manage Schools.',
+                [
+                    {
+                        text: 'OK',
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Manage Schools',
+                        onPress: () => {
+                            navigation.navigate('ManageSchool');
+                        },
+                    },
+                ],
+            );
+            return;
+        }
 
-      console.log('Form Data Submitted:', formData);
-      Alert.alert('Form Data Submitted Successfully');
+        // If all required fields are entered and the schoolName is unique, add the document to the collection
+        await addDoc(dbCollection, formData);
+
+        console.log('Form Data Submitted:', formData);
+        Alert.alert('Form Data Submitted Successfully');
     } catch (error) {
-      console.error('Error submitting form data:', error);
-      Alert.alert(
-        'An error occurred',
-        'An error occurred while submitting the form data. Please try again.',
-      );
-    }finally {
-      setIsLoading(false);
-      // Code to execute regardless of success or failure can go here
-navigation.replace('AddSchool');
+        console.error('Error submitting form data:', error);
+        Alert.alert(
+            'An error occurred',
+            'An error occurred while submitting the form data. Please try again.',
+        );
+    } finally {
+        setIsLoading(false);
+        // Update the rating after form submission
+
+        navigation.replace('AddSchool');
     }
-  };
+};
+
 
 
     return (

@@ -1,13 +1,15 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {TextInput, Button} from 'react-native-paper'; // Import Button component from react-native-paper
 import store from '../../Redux/Store';
-import {getData} from '../AsyncStorage';
+import {getData, storeData} from '../AsyncStorage';
 import {RFPercentage} from 'react-native-responsive-fontsize';
-import {collection, getDocs, query, updateDoc, where} from 'firebase/firestore';
+import {collection, getDoc, getDocs, query, updateDoc, where} from 'firebase/firestore';
 import {Firebase_DB} from '../FirebaseConfig';
+import UpdateCurrentData from './UpdateCurrentData';
 
-const UpdateData = () => {
+const UpdateData = ({navigation}) => {
+  console.log('UpdateData reached');
   const [prevData, setPrevData] = useState([]);
 
   useEffect(() => {
@@ -20,23 +22,25 @@ const UpdateData = () => {
     fetchData();
   }, []);
 
-  console.log('UpdateData reached');
+
+
 
   return (
     <ScrollView>
-      {prevData.length === 0 && (
-        <>
-          <View style={styles.Alertcontainer}>
-            <Text style={styles.text}>
-              Previous year's pass percentage data is unavailable. Please
-              provide necessary data.
-            </Text>
-          </View>
-          <UpdatePrevPass /> <UpdatePrevPass />
-        </>
-      )}
-    </ScrollView>
+  { store.getState().CurrentSchoolData.prevpass.length === 0 && (
+    <>
+      <View style={styles.Alertcontainer}>
+        <Text style={styles.text}>
+          Previous year's pass percentage data is unavailable. Please provide necessary data.
+        </Text>
+      </View>
+      <UpdatePrevPass navigation={navigation} />
+    </>
+  ) }
+<UpdateCurrentData/>
+</ScrollView>
   );
+
 };
 
 export default UpdateData;
@@ -95,7 +99,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const UpdatePrevPass = () => {
+const UpdatePrevPass = ({navigation}) => {
   const [data, setData] = useState([]); // State for pass percentage data
 
   const currentDate = new Date();
@@ -131,28 +135,28 @@ const UpdatePrevPass = () => {
 
   const handleSubmit = async () => {
     try {
-      Firebase_DB.collection('Schools')
-        .where('schoolName', '==', store.getState().CurrentSchool)
-        .get()
-        .then(function (querySnapshot) {
-          querySnapshot.forEach(function (document) {
-            document.ref.update({
-              prevpass: data,
-            });
-          });
-        })
-        .catch(function (error) {
-          console.error('Error updating document: ', error);
-        });
+      const collectionRef = collection(Firebase_DB, 'Schools');
+      const schoolName = store.getState().CurrentSchool; // Change from 'schoolname' to 'schoolName'
+      console.log('schoolName:', schoolName);
 
-      // Dispatch the 'PushPrevPass' action after the query completes successfully
-      store.dispatch({type: 'PushPrevPass', payload: data});
+      const querySnapshot = await getDocs(query(collectionRef, where('schoolName', '==', schoolName))); // Change from store.getState().CurrentSchool to schoolName
 
-      // Log the submitted pass percentage data and the updated data
+      querySnapshot.forEach((doc) => {
+        const docRef = doc.ref; // Get the reference of the document
+        const newData = { prevpass: data }; // Define the new data to update
+        updateDoc(docRef, newData); // Update the document with the new data
+      });
+
+      // Dispatch the 'PushPrevPass' action after the updates complete successfully
+      store.dispatch({ type: 'PushPrevPass', payload: data });
       console.log('Submitted pass percentage data:', data);
-      console.log('Updated data:', store.getState().CurrentSchoolData.prevpass);
     } catch (error) {
-      console.error('Error querying Firestore:', error);
+      console.error('Error updating document:', error);
+    } finally {
+      console.log('Updated data:', store.getState().CurrentSchoolData.prevpass);
+      Alert.alert('Success', 'Pass percentage data updated successfully.');
+      storeData('PREVPASS', data);
+      navigation.navigate('SchoolAnalytics');
     }
   };
 
@@ -172,7 +176,7 @@ const UpdatePrevPass = () => {
               style={styles.input}
               value={data[index] ? data[index].toString() : ''}
               onChangeText={value => handlePassPercentageChange(index, value)}
-              maxLength={3}
+              maxLength={2}
               editable
               selectTextOnFocus
               underlineColorAndroid="#1e272e"

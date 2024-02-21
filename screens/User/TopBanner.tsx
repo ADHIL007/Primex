@@ -7,7 +7,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TopBannerTiles from './TopBannerTiles';
 import { Skeleton } from '@rneui/themed';
-import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient from Expo
 import { storeData } from '../AsyncStorage';
 const TopBanner = () => {
   const [school, setSchool] = useState('');

@@ -21,6 +21,38 @@ const TopBannerTiles = () => {
 // Assuming initialData is null or an appropriate initial value
 const [data, setData] = useState('');
 
+const fetchRate = async () => {
+  setIsLoading(true); // Set loading to true before starting the fetch
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(schoolData),
+  };
+
+  try {
+    const response = await fetch(
+      'https://adhilshah.pythonanywhere.com/rate',
+      requestOptions
+    );
+    const data = await response.json();
+    const roundedRating = parseFloat(data.Rating).toFixed(2);
+    setRating(roundedRating); // Update the rating state
+    store.dispatch({type :'Update_RATING', payload : roundedRating});
+  } catch (error) {
+    console.error('Error fetching rating:', error);
+    // Optionally update the state to reflect the error
+  } finally {
+    setIsLoading(false); // Set loading to false after the fetch is complete
+  }
+};
+
+// Call fetchRate at an appropriate time, for example, when the component mounts or when schoolData changes
+
+
+
+
+
+
 useEffect(() => {
   const fetchSchools = async () => {
     try {
@@ -44,8 +76,10 @@ useEffect(() => {
 
           schoolsSnapshot.forEach(doc => {
             const schoolData = doc.data();
+
             if (schoolData.schoolName === stringWithoutQuotes) {
               setSchoolData(schoolData);
+
               store.dispatch({
                 type: 'CURRENT_SCHOOL_DATA',
                 payload: schoolData,
@@ -57,6 +91,7 @@ useEffect(() => {
               setRating(schoolData.rating);
               setLocation(schoolData.location);
               storeData('PREVPASS', schoolData.prevpass);
+
             }
           });
         } else {
@@ -69,14 +104,22 @@ useEffect(() => {
       console.error('Error fetching schools data:', error);
     } finally {
       setIsLoading(false);
+
     }
   };
 
   setTimeout(() => {
     fetchSchools();
-  },2000)
-}, [data]); // Add data and SCHOOLNAME as dependencies to re-fetch if they change
 
+  },2000)
+  setTimeout(() => {
+    fetchRate();
+  },2100)
+
+  console.log(rating);
+
+}, [data]); // Add data and SCHOOLNAME as dependencies to re-fetch if they change
+console.log(data);
 
   return (
     <View style={styles.container}>
@@ -120,8 +163,6 @@ useEffect(() => {
                 height: '50%',
                 flexDirection: 'column',
                 alignItems: 'center',
-
-                borderWidth: .3
               }}>
             {isLoading ? (
         <Skeleton animation="pulse" width={50} height={25} />
@@ -138,7 +179,7 @@ useEffect(() => {
                 height: '50%',
                 flexDirection: 'column',
                 alignItems: 'center',
-                borderWidth: .3
+
               }}>
            {isLoading ? (
         <Skeleton animation="pulse" width={50} height={25} />
@@ -154,7 +195,7 @@ useEffect(() => {
                 height: '50%',
                 flexDirection: 'column',
                 alignItems: 'center',
-                borderWidth: .3
+
               }}>
              {isLoading ? (
         <Skeleton animation="pulse" width={50} height={25} />
@@ -170,14 +211,14 @@ useEffect(() => {
                 height: 110,
                 flexDirection: 'column',
                 alignItems: 'center',
-                borderWidth: .3
+
               }}>
           {isLoading ? (
         <Skeleton animation="pulse" width={70} height={75} />
       ) : (  <Text style={[
                   styles.gridItemText,
-                  {fontWeight: 'bold', fontSize: RFPercentage(7.5)},
-                ]}>4.1</Text>)}
+                  {fontWeight: 'bold', fontSize: RFPercentage(5.5), color: rating<2.5 ? '#e74c3c' : rating < 3.5 ? '#f1c40f' : '#2ecc71'},
+                ]}>{store.getState().CurrentSchoolData?.rating}</Text>)}
             <Text style={{color: '#333'}}>Rating</Text>
           </View>
         </View>
@@ -191,23 +232,61 @@ export default TopBannerTiles;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#333',
+    backgroundColor: '#f5f5f5',
+    marginTop: 20,
   },
   gridContainer: {
+    width: '90%',
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: {width: 1, height: 1},
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  gridItem: {
+    width: '45%',
+    height: 'auto',
+    padding: 20,
+    margin: 10,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ecf0f1',
+
   },
   gridItemText: {
-    fontSize: 16,
+    fontSize: RFPercentage(2.5),
+    fontWeight: 'bold',
+    color: '#1e272e',
+    textAlign: 'center',
+  },
+  subText: {
+    fontSize: RFPercentage(2),
+    color: '#95a5a6',
+    textAlign: 'center',
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '100%',
+    padding: 10,
+  },
+  locationText: {
+    fontSize: RFPercentage(2.1),
+    color: '#2c3e50',
     marginLeft: 5,
-    marginRight: 5,
+  },
+  icon: {
     color: '#333',
   },
 });
+

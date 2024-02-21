@@ -18,6 +18,7 @@ import ManageSchool from './screens/Admin/ManageSchool'
 import LogoutAnime from './screens/LogoutAnime';
 import SchoolAnalytics from './screens/User/SchoolAnalytics';
 import UpdateData from './screens/User/UpdateData';
+import Activity from './screens/User/Activity';
 
 
 export type RootStackParamList = {
@@ -41,7 +42,8 @@ export type RootStackParamList = {
   LogoutAnime: undefined;
   UserAnalatics: undefined
   UpdateData : undefined
-  UserRecentActivity : undefined
+  Activity : undefined
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -77,6 +79,13 @@ const App = (): JSX.Element => {
           component={Login}
           options={{
             headerShown: false,
+          }}
+        />
+         <Stack.Screen
+          name="Activity"
+          component={Activity}
+          options={{
+            headerShown: true,
           }}
         />
         <Stack.Screen

@@ -22,15 +22,14 @@ const Signup = ({navigation}) => {
 
   // List of schools for the dropdown
   const [schools, setSchools] = useState([]);
-
-
+const [alreadyExist, setAlreadyExist] = useState(false);
+const [norqst, setNorqst] = useState(false);
 const getSchoolList = async () => {
   try {
     const querySnapshot = await getDocs(collection(Firebase_DB, 'Schools'));
     const schoolsData = [];
 
     querySnapshot.forEach((doc) => {
-      console.log(doc.id, ' => ', doc.data().schoolName);
       schoolsData.push(doc.data().schoolName);
     });
 
@@ -62,31 +61,35 @@ useEffect(() => {
   // Handle the signup process
   const handleSignup = async () => {
     if (password.length !== 6) {
-      Alert.alert('Password must be 6 characters long');
-    } else {
+      Alert.alert('Password must be 6 characters long or more');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Passwords do not match', 'Please make sure your passwords match.');
+      return;
+    }
 
     try {
       setLoading(true);
 
-      const UserCollection = collection(Firebase_DB, 'Users');
       const Requests = collection(Firebase_DB, 'Requests');
 
-      const userQuery = query(
-        UserCollection,
-        where('email', '==', email),
-        where('school', '==', selectedSchool)
-      );
-
-      const userSnapshot = await getDocs(userQuery);
-
-      if (!userSnapshot.empty) {
-        setLoading(false);
-        Alert.alert(
-          'Representative Already Exists',
-          'If you wish to change the representative for your school, please contact the administrator.'
-        );
-        return;
-      }
+      const userQuery = collection(Firebase_DB, 'Users');
+      const userDocSnapshot = await getDocs(userQuery);
+      userDocSnapshot.forEach(doc => {
+        const userData = doc.data();
+        if (userData.email === email) {
+          setLoading(false);
+          Alert.alert(
+            'Email Already Exists',
+            'If you wish to change your email, please contact the administrator.'
+          );
+          console.log('Email already exists');
+          setAlreadyExist(true);
+          return;
+        }
+      });
 
       const requestQuery = query(
         Requests,
@@ -102,40 +105,25 @@ useEffect(() => {
           'Request already exists',
           'Your request is pending. Please wait until an admin verifies your request.'
         );
+        setNorqst(true);
         return;
       }
 
-      if (userSnapshot && requestSnapshot) {
-        const newRequestDoc = await addDoc(Requests, {
-          Fullname: username,
-          email: email,
-          phoneNumber: phoneNumber,
-          password: password,
-          school: selectedSchool,
-        });
+      const newRequestDoc = await addDoc(Requests, {
+        Fullname: username,
+        email: email,
+        phoneNumber: phoneNumber,
+        password: password,
+        school: selectedSchool,
+      });
 
-        // Define a separate async function to use await
-        const handleAsyncOperation = async (data) => {
-          if (data != null) {
-            navigation.replace('Login');
-            setLoading(false);
-            Alert.alert(
-              'Registration Request Placed',
-              'Please wait for admin verification. Check your email within 24 hours.'
-            );
-            console.log('Document written with ID: ', data.id);
-            console.log('BEFORE', await getData('USERID'));
-            storeData('USERID', data.id);
-            console.log('AFTER', await getData('USERID'));
-          }
-        };
-
-        // Use the async function inside the then block
-        handleAsyncOperation(newRequestDoc);
-      } else {
-        setLoading(false);
-        console.log('USER ALREADY EXISTS');
-      }
+      setLoading(false);
+      Alert.alert(
+        'Registration Request Placed',
+        'Please wait for admin verification. Check your email within 24 hours.'
+      );
+      console.log('Document written with ID: ', newRequestDoc.id);
+      navigation.navigate('Login');
     } catch (error) {
       setLoading(false);
       console.error('Error during signup: ', error);
@@ -144,8 +132,9 @@ useEffect(() => {
         'An error occurred during signup. Please try again.'
       );
     }
-  }
   };
+
+
 
   // Check if the confirm password matches the password
   const checkConfirmPassword = text => {
@@ -217,7 +206,7 @@ useEffect(() => {
           style={styles.input}
           placeholder="Password"
           keyboardType='number-pad'
-
+          maxLength={6}
           secureTextEntry
           value={password}
           onChangeText={(text) => setPassword(text)}
@@ -228,10 +217,10 @@ useEffect(() => {
             styles.input,
             { borderBottomColor: wrongPassword ? 'red' : '#1e272e' },
           ]}
+          maxLength={6}
           placeholder="Confirm Password"
           secureTextEntry
           keyboardType='number-pad'
-defaultValue='ADC SCHOOL'
           value={confirmPassword}
           onChangeText={(text) => checkConfirmPassword(text)}
           placeholderTextColor="#1e272e"

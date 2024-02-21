@@ -6,7 +6,7 @@ const FlatCard = ({navigation}) => {
     <View style={styles.outerContainer}>
       <View style={styles.container}>
         <TouchableOpacity style={[styles.card, styles.cardOne]} onPress={
-          ()=>{navigation.navigate('Analytics')}}>
+          ()=>{navigation.navigate('SchoolAnalytics')}}>
           <Image
             source={require('../assets/graphics/statistics.png')}
             style={styles.image1}
@@ -29,7 +29,8 @@ const FlatCard = ({navigation}) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.card, styles.cardThree, styles.columnTile]}>
+            style={[styles.card, styles.cardThree, styles.columnTile]} onPress={
+              ()=>{navigation.navigate('Activity')}}>
             <Image
               source={require('../assets/graphics/most-recent.png')}
               style={styles.image3}
@@ -57,6 +58,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    marginTop: 20,
   },
   container: {
     padding: 8,
@@ -80,16 +82,16 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   cardOne: {
-    backgroundColor: '#64CCC5',
+    backgroundColor: '#1abc9c',
     height: 208,
     width: '50%', // 50% of the width
   },
   cardTwo: {
-    backgroundColor: '#57B894',
+    backgroundColor: '#3498db',
     width: '100%', // 40% of the width
   },
   cardThree: {
-    backgroundColor: '#3498DB',
+    backgroundColor: '#a29bfe',
     width: '100%', // 30% of the width
   },
   columnTile: {

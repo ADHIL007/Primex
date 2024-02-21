@@ -13,7 +13,7 @@ export default function reducer(
       CurrentSchool: '',
       CurrentSchoolData: [],
       CurrentUserdata :[],
-      prevpass :[]
+      predData:[]
     },
     action,
   ) {
@@ -61,7 +61,13 @@ export default function reducer(
                   prevpass: action.payload
                 }
               };
-
+      case 'Predict' :
+        return { ...state, predData: action.payload };
+        case 'Update_RATING' :
+          return { ...state, CurrentSchoolData: {
+            ...state.CurrentSchoolData,
+            rating: action.payload
+          } };
       default:
         return state;
     }

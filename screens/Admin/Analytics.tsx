@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,22 +7,31 @@ import {
   RefreshControl,
   ActivityIndicator,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import PieCharts from '../../components/PieCharts';
 import AnalyticsDatas from './AnalyticsDatas';
 import RegionCards from '../../components/RegionCards';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../App';
-import { getData, storeData } from '../AsyncStorage';
-import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
-import { Firebase_DB } from '../FirebaseConfig';
-import { categorizeByRegion } from './categorize';
-import { RegionData } from './categorize';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../App';
+import {getData, storeData} from '../AsyncStorage';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+} from 'firebase/firestore';
+import {Firebase_DB} from '../FirebaseConfig';
+import {categorizeByRegion} from './categorize';
+import {RegionData} from './categorize';
 import store from '../../Redux/Store';
+import LottieView from 'lottie-react-native';
 
 type AnalyticsProps = NativeStackScreenProps<RootStackParamList, 'Analytics'>;
 
-const Analytics = ({ navigation }: AnalyticsProps) => {
+const Analytics = ({navigation}: AnalyticsProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [totalSchools, setTotalSchools] = useState(0);
@@ -34,7 +43,6 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
     try {
       const schools = await getData('SCHOOLS');
 
-
       const RegionWiseData = categorizeByRegion(schools);
 
       const regionArrays: Record<string, RegionData[]> = {};
@@ -43,17 +51,16 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
       Object.entries(RegionWiseData).forEach(([region, data]) => {
         // Convert each region's data to an array and store it in regionArrays
 
-
         if (!regionArrays[region]) {
           regionArrays[region] = [];
         }
         regionArrays[region].push(data);
         store.dispatch({
-          type:`R${region}`,
+          type: `R${region}`,
           payload: {
-            data
-          }
-        })
+            data,
+          },
+        });
       });
 
       // Accumulate totalSchools and totalStaffs after processing all data
@@ -61,8 +68,8 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
       let updatedTotalStaffs = totalStaffs;
 
       // Process the accumulated region data
-      Object.values(regionArrays).forEach((regionDataArray) => {
-        regionDataArray.forEach((data) => {
+      Object.values(regionArrays).forEach(regionDataArray => {
+        regionDataArray.forEach(data => {
           updatedTotalSchools += data.totalSchools;
           updatedTotalStaffs += data.totalStaffs;
         });
@@ -75,14 +82,14 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
       // Check if the number of schools has changed
       if (updatedTotalSchools !== totalSchools) {
         setTotalSchools(updatedTotalSchools); // Update total schools
-        setTotalStaffs(updatedTotalStaffs);   // Update total staffs
+        setTotalStaffs(updatedTotalStaffs); // Update total staffs
 
         // Update Firebase only if the number of schools changes
         const dbCollection = collection(Firebase_DB, 'Records');
         const docRef = doc(dbCollection, 'SchoolData');
 
         // Update the document with the new data
-        await updateDoc(docRef, { data: regionArrays });
+        await updateDoc(docRef, {data: regionArrays});
         await storeData('SCHOOLSDATA', regionArrays);
         await storeData('TOTALSCHOOLS', updatedTotalSchools);
         await storeData('TOTALSTAFFS', updatedTotalStaffs);
@@ -94,12 +101,11 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
     }
   };
 
-
   const refreshData = async () => {
     try {
       const querySnapshot = await getDocs(collection(Firebase_DB, 'Schools'));
       const newData: Array<any> = [];
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach(doc => {
         console.log(doc.id, ' => ', doc.data());
         newData.push({
           // You can format the data here as needed
@@ -109,20 +115,20 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
       });
 
       console.log('New data:', newData);
-      storeData("SCHOOLS", newData);
+      storeData('SCHOOLS', newData);
 
       store.dispatch({
-        type: "SCHOOL_LIST",
+        type: 'SCHOOL_LIST',
         payload: {
-          data: newData
-        }
+          data: newData,
+        },
       });
 
       store.dispatch({
-        type: "SCHOOL_COUNT",
+        type: 'SCHOOL_COUNT',
         payload: {
-          count: newData.length
-        }
+          count: newData.length,
+        },
       });
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -131,7 +137,7 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    refreshData()
+    refreshData();
     console.log('Refreshing');
 
     setTimeout(() => {
@@ -145,7 +151,7 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
   }, []);
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <Image
@@ -162,24 +168,42 @@ const Analytics = ({ navigation }: AnalyticsProps) => {
       ) : (
         <ScrollView
           style={styles.container}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-          <PieCharts data={regionData} />
-          <AnalyticsDatas count={totalSchools} countOfStaffs={totalStaffs} />
-          <RegionCards navigation={navigation} schoolData={regionData} />
+          {totalSchools === 0 ? (
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+              <LottieView
+                source={require('../../assets/gifs/nodata.json')}
+                autoPlay
+                loop
+                style={{ width: 300, height: 300,marginTop: 250 }}
+              />
+              <Text style={{ fontSize: 18, color: '#333', fontStyle: 'italic' }}>No data available</Text>
+              <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              navigation.navigate('AddSchool');
+            }}>
+            <Text style={styles.buttonText}> Let's Get a New School Enrolled</Text>
+          </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <PieCharts data={regionData} />
+              <AnalyticsDatas count={totalSchools} countOfStaffs={totalStaffs} />
+              <RegionCards navigation={navigation} schoolData={regionData} />
+            </>
+          )}
         </ScrollView>
       )}
-    </>
+    </View>
   );
 
-};
-
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+
   },
   loadingContainer: {
     flex: 1,
@@ -204,6 +228,20 @@ const styles = StyleSheet.create({
   },
   loadingIndicator: {
     marginBottom: 20,
+  },
+  button: {
+    borderWidth: 2,
+    borderColor: '#1e272e',
+    padding: 15,
+    width: '50%',
+    borderRadius: 5,
+    marginTop: 30,
+    backgroundColor: 'transparent',
+  },
+  buttonText: {
+    color: '#1e272e',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
 

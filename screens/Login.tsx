@@ -107,6 +107,7 @@ const Login = ({navigation}: LoginProps) => {
               style={styles.input}
               placeholder="Password"
               keyboardType='numeric'
+              maxLength={6}
               secureTextEntry={true}
               placeholderTextColor={styles.placeholder.color}
               value={password}

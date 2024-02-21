@@ -45,7 +45,7 @@ const UserNavigationTab = () => {
         }}
       />
       <Tab.Screen
-        name="Analytics"
+        name="SchoolAnalytics"
         component={SchoolAnalytics}
         options={{
           tabBarLabel: 'Analytics',
@@ -77,6 +77,8 @@ const UserNavigationTab = () => {
           ),
         }}
       />
+
+
     </Tab.Navigator>
   );
 };
