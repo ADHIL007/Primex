@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { TextInput, Button } from 'react-native-paper'; // Import Button component from react-native-paper
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {TextInput, Button} from 'react-native-paper'; // Import Button component from react-native-paper
 import store from '../../Redux/Store';
-import { getData } from '../AsyncStorage';
-import { RFPercentage } from 'react-native-responsive-fontsize';
-import { collection, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import { Firebase_DB } from '../FirebaseConfig';
+import {getData} from '../AsyncStorage';
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {collection, getDocs, query, updateDoc, where} from 'firebase/firestore';
+import {Firebase_DB} from '../FirebaseConfig';
 
 const UpdateData = () => {
   const [prevData, setPrevData] = useState([]);
@@ -23,16 +23,19 @@ const UpdateData = () => {
   console.log('UpdateData reached');
 
   return (
-    <View>
+    <ScrollView>
       {prevData.length === 0 && (
         <>
           <View style={styles.Alertcontainer}>
-            <Text style={styles.text}>Previous year's pass percentage data is unavailable. Please provide necessary data.</Text>
+            <Text style={styles.text}>
+              Previous year's pass percentage data is unavailable. Please
+              provide necessary data.
+            </Text>
           </View>
-          <UpdatePrevPass />
+          <UpdatePrevPass /> <UpdatePrevPass />
         </>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -62,7 +65,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1e272e',
     color: '#1e272e',
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(3),
     marginBottom: 10,
     paddingVertical: 8, // Adjust padding for better input appearance
     paddingHorizontal: 12, // Adjust padding for better input appearance
@@ -97,7 +100,20 @@ const UpdatePrevPass = () => {
 
   const currentDate = new Date();
   const currentMonthIndex = currentDate.getMonth();
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
 
   let pastMonths = [];
 
@@ -115,23 +131,22 @@ const UpdatePrevPass = () => {
 
   const handleSubmit = async () => {
     try {
-      Firebase_DB.collection("Schools")
-  .where("schoolName", "==", store.getState().CurrentSchool)
-  .get()
-  .then(function(querySnapshot) {
-    querySnapshot.forEach(function(document) {
-      document.ref.update({
-        prevpass: data
-      });
-    });
-  })
-  .catch(function(error) {
-    console.error("Error updating document: ", error);
-  });
-
+      Firebase_DB.collection('Schools')
+        .where('schoolName', '==', store.getState().CurrentSchool)
+        .get()
+        .then(function (querySnapshot) {
+          querySnapshot.forEach(function (document) {
+            document.ref.update({
+              prevpass: data,
+            });
+          });
+        })
+        .catch(function (error) {
+          console.error('Error updating document: ', error);
+        });
 
       // Dispatch the 'PushPrevPass' action after the query completes successfully
-      store.dispatch({ type: 'PushPrevPass', payload: data });
+      store.dispatch({type: 'PushPrevPass', payload: data});
 
       // Log the submitted pass percentage data and the updated data
       console.log('Submitted pass percentage data:', data);
@@ -143,28 +158,36 @@ const UpdatePrevPass = () => {
 
   return (
     <View style={{marginTop: 20}}>
-      <Text style={styles.headingtext}>Update Previous Pass Percentage Data</Text>
+      <Text style={styles.headingtext}>
+        Update Previous Pass Percentage Data
+      </Text>
       <View style={styles.container}>
-      {pastMonths.map((month, index) => (
-        <View key={index} style={styles.monthContainer}>
-          <Text style={styles.headingtext}>{month}</Text>
-          <TextInput
-            placeholder=" %"
-            placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
-            keyboardType="numeric"
-            style={styles.input}
-            value={data[index] ? data[index].toString() : ''}
-            onChangeText={(value) => handlePassPercentageChange(index, value)}
-            maxLength={3}
-            editable
-            selectTextOnFocus
-            underlineColorAndroid="#1e272e"
-          />
-        </View>
-      ))}
+        {pastMonths.map((month, index) => (
+          <View key={index} style={styles.monthContainer}>
+            <Text style={styles.headingtext}>{month}</Text>
+            <TextInput
+              placeholder=" %"
+              placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
+              keyboardType="numeric"
+              style={styles.input}
+              value={data[index] ? data[index].toString() : ''}
+              onChangeText={value => handlePassPercentageChange(index, value)}
+              maxLength={3}
+              editable
+              selectTextOnFocus
+              underlineColorAndroid="#1e272e"
+            />
+          </View>
+        ))}
       </View>
 
-      <Button mode="contained" buttonColor="#1e272e" onPress={handleSubmit} style={styles.button}>Submit</Button>
+      <Button
+        mode="contained"
+        buttonColor="#1e272e"
+        onPress={handleSubmit}
+        style={styles.button}>
+        Submit
+      </Button>
     </View>
   );
 };
