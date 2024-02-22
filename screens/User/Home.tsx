@@ -65,6 +65,7 @@ fetchRate();
 
     setTimeout(() => {
       setRefreshing(false);
+      fetchRate();
     }, 2000);
 
   return (

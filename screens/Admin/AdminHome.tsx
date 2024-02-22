@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -9,17 +9,17 @@ import {
 } from 'react-native';
 import FlatCardAdmin from '../../components/FlatCardAdmin';
 import CountOfSchools from '../../components/CountOfSchools';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../App';
-import { collection, getDocs } from 'firebase/firestore';
-import { storeData } from '../AsyncStorage';
-import { Firebase_DB } from '../FirebaseConfig';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../App';
+import {collection, getDocs} from 'firebase/firestore';
+import {storeData} from '../AsyncStorage';
+import {Firebase_DB} from '../FirebaseConfig';
 import store from '../../Redux/Store';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 type AdminHomeProps = NativeStackScreenProps<RootStackParamList, 'AdminHome'>;
 
-const AdminHome = ({ navigation }: AdminHomeProps) => {
+const AdminHome = ({navigation}: AdminHomeProps) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -27,11 +27,14 @@ const AdminHome = ({ navigation }: AdminHomeProps) => {
   const getSchoolList = async () => {
     try {
       const querySnapshot = await getDocs(collection(Firebase_DB, 'Schools'));
-      storeData('SCHOOLS', querySnapshot.docs.map(doc => doc.data()));
+      storeData(
+        'SCHOOLS',
+        querySnapshot.docs.map(doc => doc.data()),
+      );
       const schoolsData = querySnapshot.docs.map(doc => doc.data().schoolName);
       store.dispatch({
         type: 'SCHOOL_COUNT',
-        payload: { count: schoolsData.length },
+        payload: {count: schoolsData.length},
       });
       storeData('SCHOOLLIST', schoolsData);
     } catch (error) {
@@ -47,7 +50,7 @@ const AdminHome = ({ navigation }: AdminHomeProps) => {
       const querySnapshot = await getDocs(requestsCollection);
       store.dispatch({
         type: 'REQUESTS',
-        payload: { count: querySnapshot.size },
+        payload: {count: querySnapshot.size},
       });
     } catch (error) {
       console.error('Error fetching requests:', error);
@@ -61,7 +64,6 @@ const AdminHome = ({ navigation }: AdminHomeProps) => {
     setRefreshing(true);
     fetchRequests();
   };
-
 
   useEffect(() => {
     getSchoolList();
@@ -81,7 +83,9 @@ const AdminHome = ({ navigation }: AdminHomeProps) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         <CountOfSchools />
-        <FlatCardAdmin navigation={navigation} />
+        <View style={styles.Flatcontainer}>
+          <FlatCardAdmin navigation={navigation} />
+        </View>
       </ScrollView>
       {showAlert && (
         <View style={styles.alertContainer}>
@@ -102,9 +106,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  Flatcontainer: {
+    flex: 1,
+    backgroundColor: '#ffff',
+    borderTopEndRadius: 50,
+    borderTopStartRadius: 50,
+    height: 600,
+  },
   scrollView: {
     flex: 1,
-    backgroundColor: '#eee',
+    backgroundColor: '#1e272e',
   },
   alertContainer: {
     position: 'absolute',

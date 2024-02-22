@@ -28,8 +28,8 @@ const SchoolAnalytics = ({navigation}) => {
   const [showPresent, setShowPresent] = useState(true);
   const [SchoolNewData,setSchoolNewData] = useState([])
   const onRefresh = async() => {
-    setData(store.getState().CurrentSchoolData.prevpass);
-    console.log(store.getState().CurrentSchoolData.prevpass);
+
+
 
     const collectionRef = collection(Firebase_DB, 'Schools'); // Change 'Schools' to the correct collection name
     const schoolName = store.getState().CurrentSchool; // Change 'schoolname' to 'schoolName'
@@ -141,7 +141,7 @@ const SchoolAnalytics = ({navigation}) => {
                   Data Analysis for Last 6 Months
                 </Text>
                 <Linechart
-                  chartdata={data.length > 0 ? data: [0, 0, 0, 0, 0, 0]}
+                  chartdata={store.getState().CurrentSchoolData.prevpass.length > 0 ? store.getState().CurrentSchoolData.prevpass: [0, 0, 0, 0, 0, 0]}
                   color={() => '#1abc9c'}
                   timeline="present"
                 />

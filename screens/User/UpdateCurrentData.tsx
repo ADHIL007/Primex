@@ -1,10 +1,19 @@
 import React, {useState} from 'react';
-import {Alert, StyleSheet, Text, View} from 'react-native';
-import {TextInput, Button} from 'react-native-paper';
+import {Alert, StyleSheet, Image, Text, View} from 'react-native';
+import {TextInput, Button, ActivityIndicator} from 'react-native-paper';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import store from '../../Redux/Store';
 import {Firebase_DB} from '../FirebaseConfig';
-import {collection, getDocs, query, updateDoc, where} from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
 
 const UpdateCurrentData = () => {
   const [boys, setBoys] = useState('');
@@ -14,8 +23,15 @@ const UpdateCurrentData = () => {
   const [averageTestPrepScore, setAverageTestPrepScore] = useState('');
   const [averageMentalHealthScore, setAverageMentalHealthScore] = useState('');
   const [averagePassPercentage, setAveragePassPercentage] = useState('');
-
-  const handleSubmit = async() => {
+  const [benchAndDesk, setBenchAndDesk] = useState('');
+  const [computer, setComputer] = useState('');
+  const [board, setBoard] = useState('');
+  const [classrooms, setClassrooms] = useState('');
+  const [noOfstaffs, setnoOfstaffs] = useState('');
+  const [status, setstatus] = useState('');
+  const [Loading, setLoading] = useState(false);
+  const handleSubmit = async () => {
+    setLoading(true);
     if (
       boys.trim() === '' ||
       girls.trim() === '' ||
@@ -23,7 +39,12 @@ const UpdateCurrentData = () => {
       averageAttendance.trim() === '' ||
       averageTestPrepScore.trim() === '' ||
       averageMentalHealthScore.trim() === '' ||
-      averagePassPercentage.trim() === ''
+      averagePassPercentage.trim() === '' ||
+      benchAndDesk.trim() === '' ||
+      computer.trim() === '' ||
+      board.trim() === '' ||
+      classrooms.trim() === '' ||
+      noOfstaffs.trim() === ''
     ) {
       Alert.alert(
         'Missing Information',
@@ -42,65 +63,164 @@ const UpdateCurrentData = () => {
         },
         {
           text: 'Submit',
-          onPress: () => {
-            Alert.alert(
-              'Data Updated',
-              'This data will be used to train the model',
-            );
+          onPress: async () => {
+            try {
+              const schoolData = store.getState().CurrentSchoolData;
+              const {prevpass, ...rest} = schoolData;
+              const updatedPrevPass = [
+                ...prevpass.slice(1),
+                averagePassPercentage,
+              ];
 
-            // Update schoolData in the Redux store
-            const schoolData = store.getState().CurrentSchoolData;
-            const {prevpass, ...rest} = schoolData;
-            const updatedPrevPass = [
-              ...prevpass.slice(1),
-              averagePassPercentage,
-            ];
-            console.log(updatedPrevPass);
+              const updatedSchoolData = {
+                ...rest,
+                prevpass: updatedPrevPass,
+                averageTestPrepScore: averageTestPrepScore,
+                boys: parseInt(boys),
+                girls: parseInt(girls),
+                totalTests: parseInt(totalTests),
+                averageAttendance: parseInt(averageAttendance),
+                averageMentalHealthScore: parseInt(averageMentalHealthScore),
+                Bench_and_Desk: parseInt(benchAndDesk),
+                Computer: parseInt(computer),
+                Board: parseInt(board),
+                Classrooms: parseInt(classrooms),
+                numberOfStaffs: parseInt(noOfstaffs),
+              };
 
-            const updatedSchoolData = {
-              ...rest,
-              prevpass: updatedPrevPass,
-              averageTestPrepScore: averageTestPrepScore,
-              boys: parseInt(boys),
-              girls: parseInt(girls),
-              totalTests: parseInt(totalTests),
-              averageAttendance: parseInt(averageAttendance),
-              averageMentalHealthScore: parseInt(averageMentalHealthScore),
-            };
-            console.log(updatedSchoolData);
-store.dispatch({type: 'CURRENT_SCHOOL_DATA', payload: updatedSchoolData});
+              store.dispatch({
+                type: 'CURRENT_SCHOOL_DATA',
+                payload: updatedSchoolData,
+              });
 
-            const fetchSchools = async () => {
+              const collectionRef = collection(Firebase_DB, 'Schools');
+              const schoolName = store.getState().CurrentSchool;
+              const querySnapshot = await getDocs(
+                query(collectionRef, where('schoolName', '==', schoolName)),
+              );
+
+              querySnapshot.forEach(doc => {
+                const docRef = doc.ref;
+                updateDoc(docRef, updatedSchoolData);
+              });
+              const updatedRFSchoolData = [
+                {
+                  noStudents: parseInt(girls) + parseInt(boys),
+                  noStaffs: noOfstaffs,
+                  Bench_and_Desk: benchAndDesk,
+                  Computer: computer,
+                  Board: board,
+                  Classrooms: classrooms,
+                  prevPassPercentage: schoolData.prevpass[5],
+                },
+              ];
+
+              console.log('updatedRFSchoolData', updatedRFSchoolData);
+
+              const fetchStatus = async () => {
                 try {
-                    const collectionRef = collection(Firebase_DB, 'Schools');
-                    const schoolName = store.getState().CurrentSchool; // Change from 'schoolname' to 'schoolName'
-                    console.log('schoolName:', schoolName);
-
-                    const querySnapshot = await getDocs(query(collectionRef, where('schoolName', '==', schoolName))); // Change from store.getState().CurrentSchool to schoolName
-
-                    querySnapshot.forEach((doc) => {
-                      const docRef = doc.ref; // Get the reference of the document
-
-                      updateDoc(docRef, updatedSchoolData); // Update the document with the new data
-                    });
-
+                  const RFrequestOptions = {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(updatedRFSchoolData),
+                  };
+                  const RFresponse = await fetch(
+                    'https://adhilshah.pythonanywhere.com/predictRF',
+                    RFrequestOptions,
+                  );
+                  const responseData = await RFresponse.json();
+                  console.log('response from server', responseData);
+                  setstatus(responseData.predictions);
                 } catch (error) {
-                  console.error('Error fetching schools:', error);
+                  console.error('Error fetching status:', error);
                 }
               };
 
-              fetchSchools();
-            // Dispatch action to update schoolData in Redux store
-            // dispatch(updateSchoolData(updatedSchoolData));
+              fetchStatus();
 
+              console.log(status);
+              setTimeout(async () => {
+                try {
+                  if (
+                    status[0] === 'Need Reallocation' ||
+                    status[0] === 'Fine'
+                  ) {
+                    const collectionRef = collection(
+                      Firebase_DB,
+                      'UnderPerformed',
+                    );
 
-            setBoys('');
-            setGirls('');
-            setTotalTests('');
-            setAverageAttendance('');
-            setAverageTestPrepScore('');
-            setAverageMentalHealthScore('');
-            setAveragePassPercentage('');
+                    const querySnapshot = await getDocs(
+                      query(
+                        collectionRef,
+                        where('schoolName', '==', schoolName),
+                      ),
+                    );
+
+                    if (querySnapshot.empty) {
+                      await addDoc(collectionRef, updatedSchoolData);
+                      console.log('Added to UnderPerformed collection');
+                    } else {
+                      console.log(
+                        'Already exists in UnderPerformed collection',
+                      );
+                    }
+                  } else {
+                    // Define the collection reference for the 'UnderPerformed' collection
+                    const collectionRef = collection(
+                      Firebase_DB,
+                      'UnderPerformed',
+                    );
+
+                    // Check if any document with the same school name exists in the collection
+                    const querySnapshot = await getDocs(
+                      query(
+                        collectionRef,
+                        where('schoolName', '==', schoolName),
+                      ),
+                    );
+
+                    // If a document with the same school name exists
+                    if (!querySnapshot.empty) {
+                      // Delete the document from the 'UnderPerformed' collection
+                      querySnapshot.forEach(doc => {
+                        deleteDoc(doc.ref);
+                      });
+                      console.log('Deleted from UnderPerformed collection');
+                    } else {
+                      // Log that the school does not exist in the 'UnderPerformed' collection
+                      console.log(
+                        'Does not exist in UnderPerformed collection',
+                      );
+                    }
+                  }
+                }catch(error){
+                  console.log('error'+error);
+                }finally {
+                  setLoading(false)
+                  Alert.alert('Data Updates Submitted', 'Data has been successfully updated');
+                }
+              }, 2000);
+
+              // Reset state variables
+              // setBoys('');
+              // setGirls('');
+              // setTotalTests('');
+              // setAverageAttendance('');
+              // setAverageTestPrepScore('');
+              // setAverageMentalHealthScore('');
+              // setAveragePassPercentage('');
+              // setBenchAndDesk('');
+              // setComputer('');
+              // setBoard('');
+              // setClassrooms('');
+            } catch (error) {
+              console.error('Error submitting data:', error);
+              Alert.alert(
+                'Submission Error',
+                'Failed to submit data. Please try again later.',
+              );
+            }
           },
         },
       ],
@@ -111,6 +231,16 @@ store.dispatch({type: 'CURRENT_SCHOOL_DATA', payload: updatedSchoolData});
   return (
     <View style={styles.container}>
       <Text style={styles.headingtext}>Update Current Data</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Number of Staffs"
+        onChangeText={setnoOfstaffs}
+        value={noOfstaffs}
+        keyboardType="numeric"
+        maxLength={6}
+        placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
+        underlineColorAndroid="#1e272e"
+      />
       <TextInput
         style={styles.input}
         placeholder="Number of Boys"
@@ -181,12 +311,79 @@ store.dispatch({type: 'CURRENT_SCHOOL_DATA', payload: updatedSchoolData});
         placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
         underlineColorAndroid="#1e272e"
       />
+
+      <Text style={styles.headingtext}>Resources</Text>
+      <View style={styles.commodityContainer}>
+        <Image
+          source={require('../../assets/Commodities/kansai-university-84363_640.jpg')}
+          style={styles.image}
+        />
+
+        <TextInput
+          style={styles.Rinput}
+          label="Desk and Bench"
+          value={benchAndDesk}
+          onChangeText={setBenchAndDesk}
+          keyboardType="numeric"
+          maxLength={4}
+          placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
+          underlineColorAndroid="#1e272e"
+        />
+      </View>
+      <View style={styles.commodityContainer}>
+        <Image
+          source={require('../../assets/Commodities/School-Computer-Labs-Ensure-Access-2.jpg')}
+          style={styles.image}
+        />
+        <TextInput
+          style={styles.Rinput}
+          label="Number of Computers"
+          value={computer}
+          onChangeText={setComputer}
+          keyboardType="numeric"
+          maxLength={4}
+          placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
+          underlineColorAndroid="#1e272e"
+        />
+      </View>
+      <View style={styles.commodityContainer}>
+        <Image
+          source={require('../../assets/Commodities/360_F_117556248_PZuqKIshns6b04aYgW6j9a4uF0BRuwZA.jpg')}
+          style={styles.image}
+        />
+        <TextInput
+          style={styles.Rinput}
+          label="Boards"
+          value={board}
+          onChangeText={setBoard}
+          keyboardType="numeric"
+          maxLength={4}
+          placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
+          underlineColorAndroid="#1e272e"
+        />
+      </View>
+      <View style={styles.commodityContainer}>
+        <Image
+          source={require('../../assets/Commodities/Classroom-Management-for-an-Effective-Learning-Environment-scaled.jpg')}
+          style={styles.image}
+        />
+        <TextInput
+          style={styles.Rinput}
+          label="Classroom"
+          value={classrooms}
+          onChangeText={setClassrooms}
+          keyboardType="numeric"
+          maxLength={4}
+          placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
+          underlineColorAndroid="#1e272e"
+        />
+      </View>
       <Button
         style={styles.button}
         mode="contained"
         onPress={handleSubmit}
         contentStyle={{paddingVertical: 8}}>
-        Submit
+        Submit <ActivityIndicator animating={Loading} />
       </Button>
     </View>
   );
@@ -196,11 +393,23 @@ export default UpdateCurrentData;
 
 const styles = StyleSheet.create({
   headingtext: {
-    fontSize: RFPercentage(3),
+    fontSize: RFPercentage(3.5),
     color: '#1e272e',
     textAlign: 'left',
     marginBottom: 10,
     fontWeight: 'bold',
+  },
+  Rinput: {
+    borderWidth: 1,
+    borderColor: '#1e272e',
+    color: '#1e272e',
+    fontSize: 16,
+    marginBottom: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+    backgroundColor: '#f5f6fa',
+    width: '77%',
   },
   input: {
     borderWidth: 1,
@@ -212,7 +421,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 5,
     backgroundColor: '#f5f6fa',
-    width: '100%',
+    width: '98%',
   },
   button: {
     marginTop: 20,
@@ -220,13 +429,27 @@ const styles = StyleSheet.create({
     width: '50%',
     borderRadius: 5,
     backgroundColor: '#1e272e',
+    alignItems: 'center',
+   justifyContent: 'center',
+   gap:10
   },
   container: {
+    flex: 1,
     flexDirection: 'column',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    marginBottom: 10,
-    marginTop: 20,
     paddingHorizontal: 20,
+    marginLeft: 20,
+    margin: 20,
+  },
+  commodityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  image: {
+    width: 70,
+    height: 70,
+    marginRight: 10,
   },
 });

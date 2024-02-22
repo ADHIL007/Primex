@@ -14,11 +14,13 @@ const firebaseConfig = {
     messagingSenderId: "314438490932",
     appId: "1:314438490932:web:6dd46e5009a01fffeca361",
     measurementId: "G-DKS416TVM0"
-};
-
+  };
 // Initialize Firebase
 export const Firebase_app = initializeApp(firebaseConfig);
 export const Firebase_Auth = initializeAuth(Firebase_app, {
     persistence: getReactNativePersistence(AsyncStorage),
 });
 export const Firebase_DB = getFirestore(Firebase_app);
+
+
+

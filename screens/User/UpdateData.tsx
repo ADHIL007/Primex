@@ -4,43 +4,48 @@ import {TextInput, Button} from 'react-native-paper'; // Import Button component
 import store from '../../Redux/Store';
 import {getData, storeData} from '../AsyncStorage';
 import {RFPercentage} from 'react-native-responsive-fontsize';
-import {collection, getDoc, getDocs, query, updateDoc, where} from 'firebase/firestore';
+import {
+  collection,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
 import {Firebase_DB} from '../FirebaseConfig';
 import UpdateCurrentData from './UpdateCurrentData';
 
 const UpdateData = ({navigation}) => {
   console.log('UpdateData reached');
   const [prevData, setPrevData] = useState([]);
-
+  const [show, setshow] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       const data = await getData('PREVPASS');
       setPrevData(data);
       console.log('Previous data:', data);
     };
-
+    store.getState().CurrentSchoolData.prevpass.length === 0 && setshow(true);
     fetchData();
   }, []);
 
 
-
-
   return (
     <ScrollView>
-  { store.getState().CurrentSchoolData.prevpass.length === 0 && (
-    <>
-      <View style={styles.Alertcontainer}>
-        <Text style={styles.text}>
-          Previous year's pass percentage data is unavailable. Please provide necessary data.
-        </Text>
-      </View>
-      <UpdatePrevPass navigation={navigation} />
-    </>
-  ) }
-<UpdateCurrentData/>
-</ScrollView>
+      {store.getState().CurrentSchoolData.prevpass.length === 0 && show && (
+        <>
+          <View style={styles.Alertcontainer}>
+            <Text style={styles.text}>
+              Previous year's pass percentage data is unavailable. Please
+              provide necessary data.
+            </Text>
+          </View>
+          <UpdatePrevPass navigation={navigation} setshow={setshow} />
+        </>
+      )}
+      <UpdateCurrentData />
+    </ScrollView>
   );
-
 };
 
 export default UpdateData;
@@ -99,7 +104,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const UpdatePrevPass = ({navigation}) => {
+const UpdatePrevPass = ({navigation, setshow}) => {
   const [data, setData] = useState([]); // State for pass percentage data
 
   const currentDate = new Date();
@@ -139,17 +144,20 @@ const UpdatePrevPass = ({navigation}) => {
       const schoolName = store.getState().CurrentSchool; // Change from 'schoolname' to 'schoolName'
       console.log('schoolName:', schoolName);
 
-      const querySnapshot = await getDocs(query(collectionRef, where('schoolName', '==', schoolName))); // Change from store.getState().CurrentSchool to schoolName
+      const querySnapshot = await getDocs(
+        query(collectionRef, where('schoolName', '==', schoolName)),
+      ); // Change from store.getState().CurrentSchool to schoolName
 
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach(doc => {
         const docRef = doc.ref; // Get the reference of the document
-        const newData = { prevpass: data }; // Define the new data to update
+        const newData = {prevpass: data}; // Define the new data to update
         updateDoc(docRef, newData); // Update the document with the new data
       });
 
       // Dispatch the 'PushPrevPass' action after the updates complete successfully
-      store.dispatch({ type: 'PushPrevPass', payload: data });
+      store.dispatch({type: 'PushPrevPass', payload: data});
       console.log('Submitted pass percentage data:', data);
+      setshow(false);
     } catch (error) {
       console.error('Error updating document:', error);
     } finally {

@@ -9,15 +9,11 @@ import {
   View,
 } from 'react-native';
 
-const Horizontal = () => {
+const Horizontal = ({benchAndDesk, computer, board, classrooms}) => {
   const initialCommodities = [
     {
       name: 'Desk and Bench',
       img: require('../assets/Commodities/kansai-university-84363_640.jpg'),
-    },
-    {
-      name: 'First aid',
-      img: require('../assets/Commodities/first_aid_box_4_white_1024x1024.jpg'),
     },
     {
       name: 'Computer lab',
@@ -139,6 +135,7 @@ const styles = StyleSheet.create({
     height: 500,
     marginHorizontal: 10,
     marginBottom: 16,
+    ba
   },
   commodityItemBackground: {
     borderWidth: 2,

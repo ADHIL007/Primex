@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef} from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,18 +9,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import CheckBox from 'react-native-check-box';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {
-  addDoc,
-  collection,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
-import { Firebase_DB } from '../FirebaseConfig';
-import { RFPercentage } from 'react-native-responsive-fontsize';
-
+import {addDoc, collection, getDocs, query, where} from 'firebase/firestore';
+import {Firebase_DB} from '../FirebaseConfig';
+import {RFPercentage} from 'react-native-responsive-fontsize';
 
 const Dots = ({currentSlide, totalSlides}) => {
   return (
@@ -186,8 +179,53 @@ const AddSchool = ({navigation}: any) => {
   const [slide, setSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
+  const calculateRating = formData => {
+    let rating = 0;
 
-const [formData, setFormData] = useState({
+    // Add 1 point for each lab feature present
+    Object.values(formData.labFeatures).forEach(feature => {
+      if (feature) {
+        rating += 1;
+      }
+    });
+
+    // Subtract 1 point if the school has a school bus
+    if (formData.hasSchoolBus) {
+      rating -= 1;
+    }
+
+    // Subtract 1 point if the school has a playground
+    if (formData.playground) {
+      rating -= 1;
+    }
+
+    // Subtract points based on previous pass percentage
+    const prevPassPercentage = formData.prevpass;
+    if (prevPassPercentage >= 90 && prevPassPercentage <= 100) {
+      rating -= 3;
+    } else if (prevPassPercentage >= 80 && prevPassPercentage < 90) {
+      rating -= 2;
+    } else if (prevPassPercentage >= 50 && prevPassPercentage < 80) {
+      rating -= 1;
+    }
+
+    // Subtract points based on average attendance
+    const averageAttendance = formData.averageAttendance;
+    if (averageAttendance >= 90) {
+      rating -= 2;
+    } else if (averageAttendance >= 80 && averageAttendance < 90) {
+      rating -= 1.5;
+    } else if (averageAttendance >= 50 && averageAttendance < 80) {
+      rating -= 1;
+    }
+
+    // Normalize rating to be out of 5
+    rating = Math.max(0, Math.min(5, rating));
+
+    return rating;
+  };
+  const [rating, setRating] = useState(0);
+  const [formData, setFormData] = useState({
     schoolName: '',
     location: '',
     region: 'R1', // e.g., Region 1, Region 2, ...
@@ -195,11 +233,11 @@ const [formData, setFormData] = useState({
     boys: '',
     girls: '',
     labFeatures: {
-        biologyLab: false,
-        chemistryLab: false,
-        physicsLab: false,
-        computerLab: false,
-        electronicsLab: false,
+      biologyLab: false,
+      chemistryLab: false,
+      physicsLab: false,
+      computerLab: false,
+      electronicsLab: false,
     },
     hasSchoolBus: false,
     playground: false,
@@ -209,152 +247,158 @@ const [formData, setFormData] = useState({
     averageScienceGrade: [],
     averageEnglishGrade: [],
     averageAttendance: [],
-    rating: 0
-});
+    rating: rating,
+    Bench_and_Desk: 0,
+    Computer: 0,
+    Board: 0,
+    Classrooms: 0,
+    status:'',
+    perfomance:''
+  });
 
-// Function to calculate and update the rating
+  // Function to calculate and update the rating
+  const updateRating = () => {
+    const rating = calculateRating(formData);
+    setRating(rating);
+  };
 
-const handleNext = () => {
+  const handleNext = () => {
     if (slide < slides.length - 1) {
-        setSlide(slide + 1);
+      setSlide(slide + 1);
     }
-};
+  };
 
-const handlePrevious = () => {
+  const handlePrevious = () => {
     if (slide > 0) {
-        setSlide(slide - 1);
+      setSlide(slide - 1);
     }
-};
+  };
 
-const handleSubmission = async () => {
+  const handleSubmission = async () => {
     try {
-        setIsLoading(true);
-        // Check if any required field in formData is empty
-        const requiredFields = [
-            'schoolName',
-            'location',
-            'numberOfStaffs',
-            'boys',
-            'girls',
-        ];
+      setIsLoading(true);
+      // Check if any required field in formData is empty
+      const requiredFields = [
+        'schoolName',
+        'location',
+        'numberOfStaffs',
+        'boys',
+        'girls',
+      ];
 
-        for (const key of requiredFields) {
-            if (formData[key] === '' || formData[key] === null) {
-                Alert.alert(
-                    'Incomplete Form',
-                    'Please fill out all required fields before submitting.',
-                );
-                return;
-            }
+      for (const key of requiredFields) {
+        if (formData[key] === '' || formData[key] === null) {
+          Alert.alert(
+            'Incomplete Form',
+            'Please fill out all required fields before submitting.',
+          );
+          return;
         }
+      }
 
-        const dbCollection = collection(Firebase_DB, 'Schools');
+      const dbCollection = collection(Firebase_DB, 'Schools');
 
-        // Check if a document with the same schoolName already exists
-        const schoolNameQuery = query(
-            dbCollection,
-            where('schoolName', '==', formData.schoolName),
-        );
-        const matchingDocs = await getDocs(schoolNameQuery);
+      // Check if a document with the same schoolName already exists
+      const schoolNameQuery = query(
+        dbCollection,
+        where('schoolName', '==', formData.schoolName),
+      );
+      const matchingDocs = await getDocs(schoolNameQuery);
 
-        if (matchingDocs.size > 0) {
-            // If a document with the same schoolName exists, show an alert and don't proceed
-            Alert.alert(
-                'School Name Already Exists',
-                'Please choose a different school name. If you wish to edit the school, please go to Manage Schools.',
-                [
-                    {
-                        text: 'OK',
-                        style: 'cancel',
-                    },
-                    {
-                        text: 'Manage Schools',
-                        onPress: () => {
-                            navigation.navigate('ManageSchool');
-                        },
-                    },
-                ],
-            );
-            return;
-        }
-
-        // If all required fields are entered and the schoolName is unique, add the document to the collection
-        await addDoc(dbCollection, formData);
-
-        console.log('Form Data Submitted:', formData);
-        Alert.alert('Form Data Submitted Successfully');
-    } catch (error) {
-        console.error('Error submitting form data:', error);
+      if (matchingDocs.size > 0) {
+        // If a document with the same schoolName exists, show an alert and don't proceed
         Alert.alert(
-            'An error occurred',
-            'An error occurred while submitting the form data. Please try again.',
+          'School Name Already Exists',
+          'Please choose a different school name. If you wish to edit the school, please go to Manage Schools.',
+          [
+            {
+              text: 'OK',
+              style: 'cancel',
+            },
+            {
+              text: 'Manage Schools',
+              onPress: () => {
+                navigation.navigate('ManageSchool');
+              },
+            },
+          ],
         );
+        return;
+      }
+
+      // If all required fields are entered and the schoolName is unique, add the document to the collection
+      await addDoc(dbCollection, formData);
+
+      console.log('Form Data Submitted:', formData);
+      Alert.alert('Form Data Submitted Successfully');
+    } catch (error) {
+      console.error('Error submitting form data:', error);
+      Alert.alert(
+        'An error occurred',
+        'An error occurred while submitting the form data. Please try again.',
+      );
     } finally {
-        setIsLoading(false);
-        // Update the rating after form submission
-
-        navigation.replace('AddSchool');
+      setIsLoading(false);
+      // Update the rating after form submission
+      updateRating();
+      navigation.replace('AddSchool');
     }
-};
+  };
 
-
-
-    return (
-      <View style={styles.container}>
-        <Text style={styles.headText}>Enroll a new school</Text>
-        <Dots currentSlide={slide} totalSlides={slides.length} />
-        <View style={styles.slideView}>
-          {slides[slide]({ formData, setFormData })}
-          <View style={styles.navigateBtns}>
-            {slide !== 0 && (
-              <TouchableOpacity
-                style={[
-                  styles.navigateBtn,
-                  {
-                    width: 150,
-                    backgroundColor: '#50D890',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  },
-                ]}
-                onPress={handlePrevious}
-              >
-                <AntDesign name="arrowleft" size={24} color="white" />
-                <Text style={styles.buttonText}>Previous</Text>
-              </TouchableOpacity>
-            )}
+  return (
+    <View style={styles.container}>
+      <Text style={styles.headText}>Enroll a new school</Text>
+      <Dots currentSlide={slide} totalSlides={slides.length} />
+      <View style={styles.slideView}>
+        {slides[slide]({formData, setFormData})}
+        <View style={styles.navigateBtns}>
+          {slide !== 0 && (
             <TouchableOpacity
               style={[
                 styles.navigateBtn,
                 {
-                  width: slide === 0 ? 300 : 150,
-                  backgroundColor: slide === 2 ? '#1e272e' : '#50D890',
+                  width: 150,
+                  backgroundColor: '#50D890',
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
                 },
               ]}
-              onPress={slide === 2 ? handleSubmission : handleNext}
-            >
-              {isLoading ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <>
-                  <Text style={styles.buttonText}>
-                    {slide === 2 ? 'Submit' : 'Next'}
-                  </Text>
-                  {(slide === 0 || slide === 1) && (
-                    <AntDesign name="arrowright" size={24} color="white" />
-                  )}
-                </>
-              )}
+              onPress={handlePrevious}>
+              <AntDesign name="arrowleft" size={24} color="white" />
+              <Text style={styles.buttonText}>Previous</Text>
             </TouchableOpacity>
-          </View>
+          )}
+          <TouchableOpacity
+            style={[
+              styles.navigateBtn,
+              {
+                width: slide === 0 ? 300 : 150,
+                backgroundColor: slide === 2 ? '#1e272e' : '#50D890',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+            ]}
+            onPress={slide === 2 ? handleSubmission : handleNext}>
+            {isLoading ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <>
+                <Text style={styles.buttonText}>
+                  {slide === 2 ? 'Submit' : 'Next'}
+                </Text>
+                {(slide === 0 || slide === 1) && (
+                  <AntDesign name="arrowright" size={24} color="white" />
+                )}
+              </>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
-    );
-  };
+    </View>
+  );
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -436,12 +480,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     margin: 25,
-    position:'relative'
+    position: 'relative',
   },
   checkbox: {
     alignSelf: 'center',
     marginLeft: 5,
-
   },
   dotsContainer: {
     flexDirection: 'row',

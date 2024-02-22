@@ -76,7 +76,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     padding: 10,
-    marginTop: 60,
+    marginTop: 40,
+
+
   },
   bigButton: {
     width: '55%', // Adjust as needed

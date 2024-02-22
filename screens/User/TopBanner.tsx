@@ -62,7 +62,7 @@ const TopBanner = () => {
   return (
     <View style={styles.container}>
    <Text style={styles.Schoolname}>
-  <FontAwesome5 name="school" color="#1e272e" size={35} />
+  <FontAwesome5 name="school" color="#FFF" size={35} />
   {'\t\t'}
   {school ? school : <Skeleton animation="pulse" width={200} height={35} />}
 </Text>
@@ -78,7 +78,7 @@ export default TopBanner;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ecf0f1',
+    backgroundColor: '#1e272e',
     paddingVertical: 20,
     paddingHorizontal: 10,
     marginBottom: 20,
@@ -88,14 +88,14 @@ height: 300
   },
   text: {
     fontSize: 25,
-    color: '#1e272e',
+    color: '#FFF',
     fontFamily: 'Raleway',
     textAlign: 'center',
 
   },
   Schoolname:{
     fontSize: 35,
-    color: '#1e272e',
+    color: '#FFF',
     fontFamily: 'Quicksand',
     fontWeight: 'bold',
     textAlign: 'center',

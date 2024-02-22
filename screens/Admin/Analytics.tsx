@@ -28,6 +28,7 @@ import {categorizeByRegion} from './categorize';
 import {RegionData} from './categorize';
 import store from '../../Redux/Store';
 import LottieView from 'lottie-react-native';
+import Classification from './Classification';
 
 type AnalyticsProps = NativeStackScreenProps<RootStackParamList, 'Analytics'>;
 
@@ -189,9 +190,12 @@ const Analytics = ({navigation}: AnalyticsProps) => {
             </View>
           ) : (
             <>
-              <PieCharts data={regionData} />
+              <View style = {styles.Chartcontainer}>
+                <PieCharts data={regionData} />
+                </View>
               <AnalyticsDatas count={totalSchools} countOfStaffs={totalStaffs} />
               <RegionCards navigation={navigation} schoolData={regionData} />
+             <Classification />
             </>
           )}
         </ScrollView>
@@ -201,6 +205,9 @@ const Analytics = ({navigation}: AnalyticsProps) => {
 
 }
 const styles = StyleSheet.create({
+  Chartcontainer:{
+
+  },
   container: {
     flex: 1,
 
