@@ -14,12 +14,13 @@ import AdminHome from './screens/Admin/AdminHome';
 import RepresentativeList from './screens/Admin/RepresentativeList';
 import RecentActivity from './screens/Admin/RecentActivity';
 import AddSchool from './screens/Admin/AddSchool';
-import ManageSchool from './screens/Admin/ManageSchool'
+import ManageSchool from './screens/Admin/ManageSchool';
 import LogoutAnime from './screens/LogoutAnime';
 import SchoolAnalytics from './screens/User/SchoolAnalytics';
 import UpdateData from './screens/User/UpdateData';
 import Activity from './screens/User/Activity';
-
+import Class from './screens/Admin/Class';
+import PredReport from './screens/User/PredReport';
 
 export type RootStackParamList = {
   Admin: undefined;
@@ -29,7 +30,11 @@ export type RootStackParamList = {
   Profile: undefined;
   RegionData: {
     RegionID: string;
-    SchoolData: Array<{ totalSchools: number; totalStaffs: number; totalStudents: number }>;
+    SchoolData: Array<{
+      totalSchools: number;
+      totalStaffs: number;
+      totalStudents: number;
+    }>;
   };
 
   Main: undefined;
@@ -37,13 +42,14 @@ export type RootStackParamList = {
   AdminHome: undefined;
   Representatives: undefined;
   RecentActivity: undefined;
-  AddSchool:undefined;
+  AddSchool: undefined;
   ManageSchool: undefined;
   LogoutAnime: undefined;
-  UserAnalatics: undefined
-  UpdateData : undefined
-  Activity : undefined
-
+  UserAnalatics: undefined;
+  UpdateData: undefined;
+  Activity: undefined;
+  Class: undefined;
+  PredReport:undefined
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -81,7 +87,7 @@ const App = (): JSX.Element => {
             headerShown: false,
           }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="Activity"
           component={Activity}
           options={{
@@ -104,7 +110,26 @@ const App = (): JSX.Element => {
             headerShown: false,
           }}
         />
-          <Stack.Screen
+        <Stack.Screen
+          name="Class"
+          component={Class}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="PredReport"
+          component={PredReport}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+
+        <Stack.Screen
           name="LogoutAnime"
           component={LogoutAnime}
           options={{
@@ -118,7 +143,7 @@ const App = (): JSX.Element => {
             headerShown: false,
           }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="AdminHome"
           component={AdminHome}
           options={{
@@ -157,7 +182,6 @@ const App = (): JSX.Element => {
             headerShown: true,
           }}
         />
-
       </Stack.Navigator>
     </NavigationContainer>
   );

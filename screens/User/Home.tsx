@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, RefreshControl, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import FlatCard from '../../components/FlatCard';
 import TopBanner from './TopBanner';
-import store from '../../Redux/Store';
 import { collection, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { Firebase_DB } from '../FirebaseConfig';
 import { Facilities } from './Facilities';
+import { getData, storeData } from '../AsyncStorage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import store from '../../Redux/Store';
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const Home = ({ navigation }: HomeProps) => {
   const [refreshing, setRefreshing] = useState(false);
+
 
   const fetchRate = async () => {
     const schoolData = store.getState().CurrentSchoolData;
@@ -56,28 +59,100 @@ const Home = ({ navigation }: HomeProps) => {
     }
   };
 
-  const onRefresh = () => {
+  const fetchUser = async () => {
+    try {
+      const data = await AsyncStorage.getItem('USERID');
+      const userID = data ? JSON.parse(data) : '';
+      if (userID) {
+        fetchUserData(userID);
+      }
+    } catch (error) {
+      console.error('Error fetching user ID:', error);
+    }
+  };
 
-    setRefreshing(true);
-fetchRate();
+  const fetchUserData = async (userID: string) => {
+    try {
+      const userQuerySnapshot = await getDocs(collection(Firebase_DB, 'Users'));
+      userQuerySnapshot.forEach(doc => {
+        const userData = doc.data();
+        if (userData.email === userID) {
+          const school = userData.school;
+          store.dispatch({ type: 'CURRENT_SCHOOL', payload: school });
+          storeData('SCHOOLNAME', school);
+          store.dispatch({ type: 'CURRENT_USER_DATA', payload: userData });
+          fetchSchools(school);
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
-  }
+  const fetchSchools = async (school: string) => {
+    try {
+      const schoolsQuerySnapshot = await getDocs(collection(Firebase_DB, 'Schools'));
+      schoolsQuerySnapshot.forEach(doc => {
+        const schoolData = doc.data();
+        if (schoolData.schoolName === school) {
+          setSchoolData(schoolData);
+          store.dispatch({ type: 'CURRENT_SCHOOL_DATA', payload: schoolData });
+          setStaffs(parseInt(schoolData.numberOfStaffs));
+          setRegion(schoolData.region);
+          setStudents(parseInt(schoolData.boys) + parseInt(schoolData.girls));
+          setRating(parseFloat(schoolData.rating));
+          setLocation(schoolData.location);
+          storeData('PREVPASS', schoolData.prevpass);
+        }
+      });
 
+
+
+
+    } catch (error) {
+      console.error('Error fetching schools data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [schoolData, setSchoolData] = useState({});
+  const [staffs, setStaffs] = useState(0);
+  const [region, setRegion] = useState('');
+  const [students, setStudents] = useState(0);
+  const [rating, setRating] = useState(0);
+  const [location, setLocation] = useState('');
+  useEffect(() => {
+    fetchUser();
     setTimeout(() => {
-      setRefreshing(false);
       fetchRate();
-    }, 2000);
+    },1500)
+  }, []);
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchUser();
+    setTimeout(() => {
+      fetchRate();
+    },1500)
+
+  };
 
   return (
     <View style={styles.container}>
-
       <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-         <TopBanner />
-         <Facilities/>
+        <TopBanner
+          school={schoolData.schoolName}
+          isLoading={isLoading}
+          location={location}
+          staffs={staffs}
+          students={students}
+          region={region}
+          rating={rating}
+        />
+        <Facilities school={schoolData} />
         <FlatCard navigation={navigation} />
       </ScrollView>
     </View>

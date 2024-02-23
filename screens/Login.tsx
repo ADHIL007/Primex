@@ -23,6 +23,7 @@ import {Firebase_Auth} from './FirebaseConfig';
 import {storeData} from './AsyncStorage';
 import LottieView from 'lottie-react-native';
 import store from '../Redux/Store';
+import LoginLoading from './LoginLoading';
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const Login = ({navigation}: LoginProps) => {
@@ -50,101 +51,94 @@ const Login = ({navigation}: LoginProps) => {
         storeData('USERID', 'ADMIN');
         setLoginStatus(true);
         console.log('Admin logged in successfully');
+
         setTimeout(() => {
             navigation.replace('Admin');
         }, 5500);
-    } else if (userid !== admin.userid && userid !== '' && password !== '') {
-        // For regular user login
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, userid, password);
-            console.log('User logged in successfully:', userCredential);
-            storeData('USERSTATUS', true);
-            storeData('USERID', userid);
-            console.log(userCredential);
+    } else if ((userid !== admin.userid && userid !== '' && password !== '')) // For regular user login
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, userid, password);
+        console.log('User logged in successfully:', userCredential);
+        storeData('USERSTATUS', true);
+        storeData('USERID', userid);
+        console.log(userCredential);
 
-            setLoginStatus(true);
-            setTimeout(() => {
-                navigation.replace('Home');
-            }, 5500);
-            store.dispatch({
-                type: 'USER',
-                payload: userid
-            });
-        } catch (error) {
-            setLoading(false); // Reset loading on login failure
-            console.log('Error', error);
-            Alert.alert(error.message);
-        }
+        setLoginStatus(true);
+        setTimeout(() => {
+            navigation.replace('Home');
+        }, 5500);
+        store.dispatch({
+            type: 'USER',
+            payload: userid
+        });
+
+    } catch (error) {
+        setLoading(false); // Reset loading on login failure
+        console.log('Error', error);
+        Alert.alert(error.message);
     } else {
         Alert.alert('Please enter username and password');
     }
 };
 
 
-  return (
-    <>
+  return (<>
+    {loginStatus ? (
+      <LoginLoading />
+    ) : (
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome Back!</Text>
 
-      {loginStatus ? (
-        <View style={styles.lottiecontainer}>
-          <LottieView source={require('../assets/gifs/Loginsuccess.json')} autoPlay loop style={{flex: 1,width: 600, height: 600}} />
-       <Text style={styles.lottieText}>Login SuccessFull</Text>
-       <Text style={[styles.lottieText, {fontSize: 30,top: "70%"}]}>Redirecting...</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="User ID or email"
+            placeholderTextColor={styles.placeholder.color}
+            autoFocus={false}
+            value={userid}
+            onChangeText={text => setUserid(text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            keyboardType='numeric'
+            maxLength={6}
+            secureTextEntry={true}
+            placeholderTextColor={styles.placeholder.color}
+            value={password}
+            onChangeText={text => setPassword(text)}
+          />
         </View>
-      ) : (
-        <View style={styles.container}>
-          <Text style={styles.title}>Welcome Back!</Text>
-
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="User ID or email"
-              placeholderTextColor={styles.placeholder.color}
-              autoFocus={false}
-              value={userid}
-              onChangeText={text => setUserid(text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              keyboardType='numeric'
-              maxLength={6}
-              secureTextEntry={true}
-              placeholderTextColor={styles.placeholder.color}
-              value={password}
-              onChangeText={text => setPassword(text)}
-            />
+        <View style={styles.buttonCont}>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            {loading ? (
+              (<ActivityIndicator color="#1e272e" size="small" />) // Show loading indicator
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
+          </TouchableOpacity>
+          <View style={styles.linkCont}>
+            <Text style={{color: '#1e272e', fontSize: 18}}>
+              Don't Have an Account
+            </Text>
+            <Link
+              to={{screen: 'Signup'}}
+              style={{color: '#05c46b', fontSize: 18, fontStyle: 'italic'}}>
+              Sign up now
+            </Link>
           </View>
-          <View style={styles.buttonCont}>
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              {loading ? (
-                <ActivityIndicator color="#1e272e" size="small" /> // Show loading indicator
-              ) : (
-                <Text style={styles.buttonText}>Login</Text>
-              )}
-            </TouchableOpacity>
-            <View style={styles.linkCont}>
-              <Text style={{color: '#1e272e', fontSize: 18}}>
-                Don't Have an Account
-              </Text>
-              <Link
-                to={{screen: 'Signup'}}
-                style={{color: '#05c46b', fontSize: 18, fontStyle: 'italic'}}>
-                Sign up now
-              </Link>
-            </View>
-          </View>
-
-      <LottieView
-        source={require('../assets/gifs/Login.json')}
-        autoPlay
-        loop
-        style={styles.lottCont}
-      />
-
         </View>
-      )}
-    </>
-  );
+
+    <LottieView
+      source={require('../assets/gifs/Login.json')}
+      autoPlay
+      loop
+      style={styles.lottCont}
+    />
+
+      </View>
+    )}
+  </>);
 };
 
 const styles = StyleSheet.create({
@@ -155,24 +149,6 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 20,
   },
-  lottiecontainer:{
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column',
-  },
-  lottieText:{
-    position: 'absolute',
-    top:'65%',
-fontSize: 40,
-color: '#1e272e',
-
-  },
-  lottCont: {
-    flex: 1,
-
-  },
-
   buttonCont: {
     alignItems: 'center',
   },

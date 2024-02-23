@@ -1,14 +1,11 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, StyleSheet, Image, Text, View} from 'react-native';
-import {TextInput, Button, ActivityIndicator} from 'react-native-paper';
+import {TextInput, Button} from 'react-native-paper';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import store from '../../Redux/Store';
 import {Firebase_DB} from '../FirebaseConfig';
 import {
-  addDoc,
   collection,
-  deleteDoc,
-  doc,
   getDocs,
   query,
   updateDoc,
@@ -28,10 +25,11 @@ const UpdateCurrentData = () => {
   const [board, setBoard] = useState('');
   const [classrooms, setClassrooms] = useState('');
   const [noOfstaffs, setnoOfstaffs] = useState('');
-  const [status, setstatus] = useState('');
-  const [Loading, setLoading] = useState(false);
+
+
+
   const handleSubmit = async () => {
-    setLoading(true);
+
     if (
       boys.trim() === '' ||
       girls.trim() === '' ||
@@ -65,14 +63,15 @@ const UpdateCurrentData = () => {
           text: 'Submit',
           onPress: async () => {
             try {
+
               const schoolData = store.getState().CurrentSchoolData;
               const {prevpass, ...rest} = schoolData;
-              const updatedPrevPass = [
-                ...prevpass.slice(1),
-                averagePassPercentage,
-              ];
+              console.log(prevpass);
 
-              const updatedSchoolData = {
+              const updatedPrevPass = [...prevpass.slice(1), averagePassPercentage];
+              console.log(updatedPrevPass);
+
+        const updatedSchoolData =     {
                 ...rest,
                 prevpass: updatedPrevPass,
                 averageTestPrepScore: averageTestPrepScore,
@@ -86,121 +85,27 @@ const UpdateCurrentData = () => {
                 Board: parseInt(board),
                 Classrooms: parseInt(classrooms),
                 numberOfStaffs: parseInt(noOfstaffs),
-              };
+              }
 
-              store.dispatch({
-                type: 'CURRENT_SCHOOL_DATA',
-                payload: updatedSchoolData,
-              });
+                store.dispatch({
+                    type: 'CURRENT_SCHOOL_DATA',
+                    payload: updatedSchoolData,
+                });
 
-              const collectionRef = collection(Firebase_DB, 'Schools');
-              const schoolName = store.getState().CurrentSchool;
-              const querySnapshot = await getDocs(
-                query(collectionRef, where('schoolName', '==', schoolName)),
-              );
+                const collectionRef = collection(Firebase_DB, 'Schools');
+                const schoolName = store.getState().CurrentSchool;
+                const querySnapshot = await getDocs(
+                    query(collectionRef, where('schoolName', '==', schoolName)),
+                );
+                console.log(updatedSchoolData);
 
-              querySnapshot.forEach(doc => {
-                const docRef = doc.ref;
-                updateDoc(docRef, updatedSchoolData);
-              });
-              const updatedRFSchoolData = [
-                {
-                  noStudents: parseInt(girls) + parseInt(boys),
-                  noStaffs: noOfstaffs,
-                  Bench_and_Desk: benchAndDesk,
-                  Computer: computer,
-                  Board: board,
-                  Classrooms: classrooms,
-                  prevPassPercentage: schoolData.prevpass[5],
-                },
-              ];
+                querySnapshot.forEach(doc => {
+                    const docRef = doc.ref;
+                    updateDoc(docRef, updatedSchoolData);
+                });
 
-              console.log('updatedRFSchoolData', updatedRFSchoolData);
 
-              const fetchStatus = async () => {
-                try {
-                  const RFrequestOptions = {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(updatedRFSchoolData),
-                  };
-                  const RFresponse = await fetch(
-                    'https://adhilshah.pythonanywhere.com/predictRF',
-                    RFrequestOptions,
-                  );
-                  const responseData = await RFresponse.json();
-                  console.log('response from server', responseData);
-                  setstatus(responseData.predictions);
-                } catch (error) {
-                  console.error('Error fetching status:', error);
-                }
-              };
 
-              fetchStatus();
-
-              console.log(status);
-              setTimeout(async () => {
-                try {
-                  if (
-                    status[0] === 'Need Reallocation' ||
-                    status[0] === 'Fine'
-                  ) {
-                    const collectionRef = collection(
-                      Firebase_DB,
-                      'UnderPerformed',
-                    );
-
-                    const querySnapshot = await getDocs(
-                      query(
-                        collectionRef,
-                        where('schoolName', '==', schoolName),
-                      ),
-                    );
-
-                    if (querySnapshot.empty) {
-                      await addDoc(collectionRef, updatedSchoolData);
-                      console.log('Added to UnderPerformed collection');
-                    } else {
-                      console.log(
-                        'Already exists in UnderPerformed collection',
-                      );
-                    }
-                  } else {
-                    // Define the collection reference for the 'UnderPerformed' collection
-                    const collectionRef = collection(
-                      Firebase_DB,
-                      'UnderPerformed',
-                    );
-
-                    // Check if any document with the same school name exists in the collection
-                    const querySnapshot = await getDocs(
-                      query(
-                        collectionRef,
-                        where('schoolName', '==', schoolName),
-                      ),
-                    );
-
-                    // If a document with the same school name exists
-                    if (!querySnapshot.empty) {
-                      // Delete the document from the 'UnderPerformed' collection
-                      querySnapshot.forEach(doc => {
-                        deleteDoc(doc.ref);
-                      });
-                      console.log('Deleted from UnderPerformed collection');
-                    } else {
-                      // Log that the school does not exist in the 'UnderPerformed' collection
-                      console.log(
-                        'Does not exist in UnderPerformed collection',
-                      );
-                    }
-                  }
-                }catch(error){
-                  console.log('error'+error);
-                }finally {
-                  setLoading(false)
-                  Alert.alert('Data Updates Submitted', 'Data has been successfully updated');
-                }
-              }, 2000);
 
               // Reset state variables
               // setBoys('');
@@ -267,7 +172,7 @@ const UpdateCurrentData = () => {
         onChangeText={setTotalTests}
         value={totalTests}
         keyboardType="numeric"
-        maxLength={2}
+        maxLength={3}
         placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
         underlineColorAndroid="#1e272e"
       />
@@ -277,7 +182,7 @@ const UpdateCurrentData = () => {
         onChangeText={setAverageAttendance}
         value={averageAttendance}
         keyboardType="numeric"
-        maxLength={2}
+        maxLength={3}
         placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
         underlineColorAndroid="#1e272e"
       />
@@ -287,7 +192,7 @@ const UpdateCurrentData = () => {
         onChangeText={setAverageTestPrepScore}
         value={averageTestPrepScore}
         keyboardType="numeric"
-        maxLength={2}
+        maxLength={3}
         placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
         underlineColorAndroid="#1e272e"
       />
@@ -297,7 +202,7 @@ const UpdateCurrentData = () => {
         onChangeText={setAverageMentalHealthScore}
         value={averageMentalHealthScore}
         keyboardType="numeric"
-        maxLength={2}
+        maxLength={3}
         placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
         underlineColorAndroid="#1e272e"
       />
@@ -307,7 +212,7 @@ const UpdateCurrentData = () => {
         onChangeText={setAveragePassPercentage}
         value={averagePassPercentage}
         keyboardType="numeric"
-        maxLength={2}
+        maxLength={3}
         placeholderTextColor={'rgba(30, 39, 46, 0.3)'}
         underlineColorAndroid="#1e272e"
       />
@@ -383,7 +288,7 @@ const UpdateCurrentData = () => {
         mode="contained"
         onPress={handleSubmit}
         contentStyle={{paddingVertical: 8}}>
-        Submit <ActivityIndicator animating={Loading} />
+        Submit
       </Button>
     </View>
   );
@@ -429,9 +334,6 @@ const styles = StyleSheet.create({
     width: '50%',
     borderRadius: 5,
     backgroundColor: '#1e272e',
-    alignItems: 'center',
-   justifyContent: 'center',
-   gap:10
   },
   container: {
     flex: 1,

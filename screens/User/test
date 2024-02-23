@@ -1,0 +1,82 @@
+ // const updatedRFSchoolData = [
+              //   {
+              //     noStudents: parseInt(girls) + parseInt(boys),
+              //     noStaffs: noOfstaffs,
+              //     Bench_and_Desk: benchAndDesk,
+              //     Computer: computer,
+              //     Board: board,
+              //     Classrooms: classrooms,
+              //     prevPassPercentage: averagePassPercentage,
+              //   },
+              // ];
+
+              // console.log('updatedRFSchoolData', updatedRFSchoolData);
+
+              // const fetchStatus = async () => {
+              //   try {
+              //     const RFrequestOptions = {
+              //       method: 'POST',
+              //       headers: {'Content-Type': 'application/json'},
+              //       body: JSON.stringify(updatedRFSchoolData),
+              //     };
+              //     const RFresponse = await fetch(
+              //       'https://adhilshah.pythonanywhere.com/predictRF',
+              //       RFrequestOptions,
+              //     );
+              //     const responseData = await RFresponse.json();
+              //     console.log('response from server', responseData);
+              //     setstatus(responseData.predictions[0]);
+              //   } catch (error) {
+              //     console.error('Error fetching status:', error);
+              //   }
+              // };
+
+              // fetchStatus();
+              // if (status === 'Need Reallocation') {
+              //   const collectionRef = collection(Firebase_DB, 'UnderPerformed');
+
+              //   const querySnapshot = await getDocs(
+              //     query(
+              //       collectionRef,
+              //       where(
+              //         'schoolName',
+              //         '==',
+              //         store.getState().CurrentSchoolData.schoolName,
+              //       ),
+              //     ),
+              //   );
+
+              //   if (querySnapshot.empty) {
+              //     await addDoc(collectionRef, updatedSchoolData);
+              //     console.log('Added to UnderPerformed collection');
+              //   } else {
+              //     console.log('Already exists in UnderPerformed collection');
+              //   }
+              // } else {
+              //   // Define the collection reference for the 'UnderPerformed' collection
+              //   const collectionRef = collection(Firebase_DB, 'UnderPerformed');
+
+              //   // Check if any document with the same school name exists in the collection
+              //   const querySnapshot = await getDocs(
+              //     query(
+              //       collectionRef,
+              //       where(
+              //         'schoolName',
+              //         '==',
+              //         store.getState().CurrentSchoolData.schoolName,
+              //       ),
+              //     ),
+              //   );
+
+              //   // If a document with the same school name exists
+              //   if (!querySnapshot.empty) {
+              //     // Delete the document from the 'UnderPerformed' collection
+              //     querySnapshot.forEach(doc => {
+              //       deleteDoc(doc.ref);
+              //     });
+              //     console.log('Deleted from UnderPerformed collection');
+              //   } else {
+              //     // Log that the school does not exist in the 'UnderPerformed' collection
+              //     console.log('Does not exist in UnderPerformed collection');
+              //   }
+              // }

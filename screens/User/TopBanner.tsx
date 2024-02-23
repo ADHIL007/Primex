@@ -8,56 +8,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TopBannerTiles from './TopBannerTiles';
 import { Skeleton } from '@rneui/themed';
 import { storeData } from '../AsyncStorage';
-const TopBanner = () => {
-  const [school, setSchool] = useState('');
-  const [userID, setUserID] = useState(store.getState().USER);
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    if (userID) {
-      fetchUserData();
-    }
-  }, [userID]);
-
-  const fetchUser = async () =>{
-    try {
-      const data = await AsyncStorage.getItem('USERID');
-      if (data) {
-        const stringWithoutQuotes = data.replace(/^"(.*)"$/, '$1');
-        setUserID(stringWithoutQuotes);
-      }
-    } catch (error) {
-      console.error('Error fetching user ID:', error);
-    }
-  }
-
-  const fetchUserData = async () => {
-    try {
-      const userQuery = collection(Firebase_DB, 'Users');
-      const userDocSnapshot = await getDocs(userQuery);
-      userDocSnapshot.forEach(doc => {
-        const userData = doc.data();
-        if (userData.email === userID) {
-          setSchool(userData.school);
-          store.dispatch({
-            type: 'CURRENT_SCHOOL',
-            payload: userData.school,
-          })
-          storeData('SCHOOLNAME', userData.school);
-          store.dispatch({
-            type: 'CURRENT_USER_DATA',
-            payload: userData,
-          })
-
-        }
-      });
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
+const TopBanner = ({school, isLoading,location ,staffs,students,region,rating}) => {
 
   return (
     <View style={styles.container}>
@@ -68,7 +19,7 @@ const TopBanner = () => {
 </Text>
 
     <Text style={styles.text}>Management Portal</Text>
-    <TopBannerTiles/>
+    <TopBannerTiles isLoading={isLoading} location={location} staffs={staffs} students={students} region={region} rating={rating}/>
   </View>
 
   );

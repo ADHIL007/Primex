@@ -14,35 +14,39 @@ import store from '../../Redux/Store';
 import {storeData} from '../AsyncStorage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LottieView from 'lottie-react-native';
-import TableGen from '../../components/TableGen';
 import SchoolData from '../../components/SchoolData';
-import { collection, getDoc, getDocs, query, where } from 'firebase/firestore';
-import { Firebase_DB } from '../FirebaseConfig';
+import {
+  collection,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
+import {Firebase_DB} from '../FirebaseConfig';
 
 const SchoolAnalytics = ({navigation}) => {
   const [dataExist, setDataExist] = useState(true);
   const [data, setData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true);
+
   const [showPrediction, setShowPrediction] = useState(false);
   const [showPresent, setShowPresent] = useState(true);
-  const [SchoolNewData,setSchoolNewData] = useState([])
-  const onRefresh = async() => {
+  const [SchoolNewData, setSchoolNewData] = useState([]);
 
-
-
+  const onRefresh = async () => {
     const collectionRef = collection(Firebase_DB, 'Schools'); // Change 'Schools' to the correct collection name
     const schoolName = store.getState().CurrentSchool; // Change 'schoolname' to 'schoolName'
     console.log('schoolName:', schoolName);
 
     const querySnapshot = await getDocs(
-      query(collectionRef, where('schoolName', '==', schoolName))
+      query(collectionRef, where('schoolName', '==', schoolName)),
     );
-    querySnapshot.forEach(async (doc) => {
+    querySnapshot.forEach(async doc => {
       const docRef = doc.ref;
       const docSnapshot = await getDoc(docRef); // Fetch the document data
       const docData = docSnapshot.data(); // Extract the data from the document snapshot
-      store.dispatch({ type: 'CURRENT_SCHOOL_DATA', payload: docData }); // Dispatch the data to the store
+      store.dispatch({type: 'CURRENT_SCHOOL_DATA', payload: docData}); // Dispatch the data to the store
     });
     setDataExist(true);
   };
@@ -66,8 +70,11 @@ const SchoolAnalytics = ({navigation}) => {
   }, []);
   const [prediction, setPrediction] = useState([]);
   const [decreasing, setDecreasing] = useState(true);
+  const [updatedSchoolData, setUpdatedSchoolData] = useState({});
+
   const handlePredict = async () => {
     setShowPresent(false);
+
     const generateRandomData = () => {
       const randomInRange = (min, max) => {
         return Math.floor(Math.random() * (max - min + 1) + min);
@@ -75,12 +82,14 @@ const SchoolAnalytics = ({navigation}) => {
 
       const data = [];
       const numRecords = 6; // Number of records to generate
-  const students = parseInt(store.getState().CurrentSchoolData.boys) + parseInt(store.getState().CurrentSchoolData.girls);
-  console.log(students);
+      const students =
+        parseInt(store.getState().CurrentSchoolData.boys) +
+        parseInt(store.getState().CurrentSchoolData.girls);
+      console.log(students);
 
-  for (let i = 0; i < numRecords; i++) {
+      for (let i = 0; i < numRecords; i++) {
         const record = {
-          total_students: randomInRange(students -10, students + 10), // Random value between 90 and 110
+          total_students: randomInRange(students - 10, students + 10), // Random value between 90 and 110
           total_tests: randomInRange(1, 5), // Random value between 3 and 5
           average_attendance: randomInRange(40, 90), // Random value between 40 and 60
           average_test_prep_score: randomInRange(40, 90), // Random value between 80 and 90
@@ -117,11 +126,29 @@ const SchoolAnalytics = ({navigation}) => {
       // Set the state for predictions and decreasing
       setPrediction(predictions);
       setDecreasing(decreasing);
+      const collectionRef = collection(Firebase_DB, 'Schools');
+      const schoolName = store.getState().CurrentSchool;
+      const querySnapshot = await getDocs(
+        query(collectionRef, where('schoolName', '==', schoolName)),
+      );
+
+      const schoolData = store.getState().CurrentSchoolData;
+      const {perfomance, ...rest} = schoolData;
+      setUpdatedSchoolData({
+        ...rest,
+        perfomance: decreasing ? 'Decreasing' : 'Increasing',
+      });
+      console.log(updatedSchoolData);
+
+      querySnapshot.forEach(doc => {
+        const docRef = doc.ref;
+        updateDoc(docRef, updatedSchoolData);
+      });
     } catch (error) {
       console.error(error);
     } finally {
       // Ensure loading and chartloading are set to false after API call is completed
-      setLoading(false);
+
       setShowPrediction(true);
     }
   };
@@ -141,28 +168,33 @@ const SchoolAnalytics = ({navigation}) => {
                   Data Analysis for Last 6 Months
                 </Text>
                 <Linechart
-                  chartdata={store.getState().CurrentSchoolData.prevpass.length > 0 ? store.getState().CurrentSchoolData.prevpass: [0, 0, 0, 0, 0, 0]}
+                  chartdata={
+                    store.getState().CurrentSchoolData.prevpass.length > 0
+                      ? store.getState().CurrentSchoolData.prevpass
+                      : [0, 0, 0, 0, 0, 0]
+                  }
                   color={() => '#1abc9c'}
                   timeline="present"
                 />
               </View>
             )}
 
-            {showPrediction && (
-              <View >
+            {showPrediction && prediction && (
+              <View>
                 <Text style={styles.title}>
                   Model A Predictions for the Next 6 Months
                 </Text>
-                  <Linechart
-                    chartdata={
-                      prediction.length > 0 ? prediction : [0, 0, 0, 0, 0, 0]
-                    }
-                    color={() => '#3498db'}
-                    timeline="future"
-                  />
+                <Linechart
+                  chartdata={
+                    prediction.length > 0 ? prediction : [0, 0, 0, 0, 0, 0]
+                  }
+                  color={() => '#3498db'}
+                  timeline="future"
+                />
               </View>
             )}
           </View>
+
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               onPress={() => {
@@ -211,28 +243,37 @@ const SchoolAnalytics = ({navigation}) => {
               </Text>
             </TouchableOpacity>
           </View>
-          {showPrediction &&<View style={styles.statusCont}>
-            {decreasing ? (
-              <View style={styles.statustextcont}>
-                <Text style={[styles.statusText, {color: '#ff3838'}]}>
-                  Performance Decreasing
+
+          {showPrediction && (
+            <View>
+              {decreasing ? (
+                <View
+                  style={[styles.statustextcont]}
+                  style={[styles.statustextcont, {backgroundColor: '#ff3f34'}]}>
+                  <Text style={[styles.statusText, {color: '#fff'}]}>
+                    Performance Decreasing
+                    <Ionicons
+                      name="trending-down"
+                      size={RFPercentage(3)}
+                      color="#ffff"
+                    />
+                  </Text>
+                </View>
+              ) : (
+                <View
+                  style={[styles.statustextcont, {backgroundColor: '#0be881'}]}>
+                  <Text style={[styles.statusText, {color: '#ffff'}]}>
+                    Performance Increasing
+                  </Text>
                   <Ionicons
-                    name="trending-down"
-                    size={RFPercentage(3)}
-                    color="#ff3838"
+                    name="trending-up"
+                    size={RFPercentage(2.5)}
+                    color="#fff"
                   />
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.statustextcont}>
-                <Text style={[styles.statusText, {color: '#2ecc71'}]}>
-                  Performance Increasing
-                </Text>
-                <Ionicons name="trending-up" size={30} color="green" />
-              </View>
-            )}
-            <TableGen />
-          </View>}
+                </View>
+              )}
+            </View>
+          )}
         </View>
       ) : (
         <View style={styles.emptyContainer}>
@@ -256,7 +297,18 @@ const SchoolAnalytics = ({navigation}) => {
           </TouchableOpacity>
         </View>
       )}
-      <SchoolData data = {SchoolNewData} />
+      <SchoolData data={SchoolNewData} />
+
+      {showPrediction &&<TouchableOpacity
+        style={styles.Reportcontainer}
+        onPress={() => navigation.navigate('PredReport')}>
+        <Text style={styles.Reporttitle}>Report</Text>
+        <Ionicons
+          name="chevron-forward-outline"
+          size={RFPercentage(2.5)}
+          color="#fff"
+        />
+      </TouchableOpacity>}
     </ScrollView>
   );
 };
@@ -264,6 +316,23 @@ const SchoolAnalytics = ({navigation}) => {
 export default SchoolAnalytics;
 
 const styles = StyleSheet.create({
+  Reportcontainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    marginTop: 455,
+    left: 330,
+    borderWidth: 0.5,
+    borderColor: '#2c3e50',
+    backgroundColor: '#1e272e',
+    borderRadius: 50,
+    padding: 10,
+  },
+  Reporttitle: {
+    color: '#fff',
+    fontSize: RFPercentage(2),
+  },
   statusCont: {
     backgroundColor: '#fff',
     width: 400,
@@ -274,26 +343,25 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   statustextcont: {
-    borderWidth: 0.5,
-    borderColor: '#2c3e50',
-    borderRadius: 10,
-    padding: 5,
     flexDirection: 'row',
-    width: '60%',
+    width: '40%',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 10,
-    left: 140,
+    position: 'absolute',
+    marginTop: -450,
+    left: 40,
+    borderRadius: 20,
+    padding: 5,
   },
   statusText: {
     color: '#2c3e50',
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.6),
+    fontWeight: 'bold',
   },
   container: {
     flexGrow: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-
   },
   Chartscontainer: {
     width: '100%',
@@ -329,7 +397,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     marginTop: 30,
-
   },
   button: {
     borderWidth: 1,
@@ -338,7 +405,6 @@ const styles = StyleSheet.create({
     width: '25%',
     borderRadius: 50,
     backgroundColor: '',
-
   },
   buttonText: {
     color: '#1e272e',
