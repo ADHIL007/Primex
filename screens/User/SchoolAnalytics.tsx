@@ -7,13 +7,13 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import Linechart from './Linechart';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import store from '../../Redux/Store';
 import {storeData} from '../AsyncStorage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import LottieView from 'lottie-react-native';
 import SchoolData from '../../components/SchoolData';
 import {
   collection,
@@ -24,7 +24,9 @@ import {
   where,
 } from 'firebase/firestore';
 import {Firebase_DB} from '../FirebaseConfig';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
+const { width, height } = Dimensions.get('window');
 const SchoolAnalytics = ({navigation}) => {
   const [dataExist, setDataExist] = useState(true);
   const [data, setData] = useState([]);
@@ -91,9 +93,9 @@ const SchoolAnalytics = ({navigation}) => {
         const record = {
           total_students: randomInRange(students - 10, students + 10), // Random value between 90 and 110
           total_tests: randomInRange(1, 5), // Random value between 3 and 5
-          average_attendance: randomInRange(40, 90), // Random value between 40 and 60
-          average_test_prep_score: randomInRange(40, 90), // Random value between 80 and 90
-          average_mental_health_score: randomInRange(40, 99), // Random value between 70 and 80
+          average_attendance: randomInRange(10, 100), // Random value between 40 and 60
+          average_test_prep_score: randomInRange(10, 100), // Random value between 80 and 90
+          average_mental_health_score: randomInRange(10, 99), // Random value between 70 and 80
         };
         data.push(record);
       }
@@ -254,7 +256,7 @@ const SchoolAnalytics = ({navigation}) => {
                     Performance Decreasing
                     <Ionicons
                       name="trending-down"
-                      size={RFPercentage(3)}
+                      size={height * 0.02}
                       color="#ffff"
                     />
                   </Text>
@@ -322,7 +324,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     marginTop: 455,
-    left: 330,
+    left: height*.37,
     borderWidth: 0.5,
     borderColor: '#2c3e50',
     backgroundColor: '#1e272e',
@@ -344,18 +346,17 @@ const styles = StyleSheet.create({
   },
   statustextcont: {
     flexDirection: 'row',
-    width: '40%',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    marginTop: -450,
-    left: 40,
+      top:- hp('50%'),
+      left:width*.1,
     borderRadius: 20,
     padding: 5,
   },
   statusText: {
     color: '#2c3e50',
-    fontSize: RFPercentage(1.6),
+    fontSize: height * 0.014, // Adjust fontSize to be responsive
     fontWeight: 'bold',
   },
   container: {
