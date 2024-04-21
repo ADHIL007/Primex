@@ -16,7 +16,7 @@ const UserNavigationTab = () => {
     <Tab.Navigator
       initialRouteName="userHome"
       screenOptions={{
-        tabBarActiveTintColor: '#00B8A9',
+        tabBarActiveTintColor: '#18dcff',
         tabBarStyle: {
           height: 60,
           backgroundColor: '#FFFFFF', // Background color for the tab bar

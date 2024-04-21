@@ -1,17 +1,15 @@
 import React from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import AntIcon from 'react-native-vector-icons/AntDesign'
 const FlatCard = ({navigation}) => {
   return (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
         <TouchableOpacity style={[styles.card, styles.cardOne]} onPress={
           ()=>{navigation.navigate('SchoolAnalytics')}}>
-          <Image
-            source={require('../assets/graphics/statistics.png')}
-            style={styles.image1}
-            resizeMode="contain"
-          />
+        <Icon name ='google-analytics' size={90} color='#fff'/>
           <Text style={styles.cardText}>Analytics</Text>
         </TouchableOpacity>
         <View style={styles.columnCont}>
@@ -19,11 +17,7 @@ const FlatCard = ({navigation}) => {
             style={[styles.card, styles.cardTwo, styles.columnTile]}
             onPress={
               ()=>{navigation.navigate('UpdateData')}}>
-            <Image
-              source={require('../assets/graphics/checklist.png')}
-              style={styles.image2}
-              resizeMode="contain"
-            />
+           <Icon name ='update' size={40} color='#fff'/>
             <Text style={[styles.cardText, styles.columnText]}>
               Update data
             </Text>
@@ -31,16 +25,30 @@ const FlatCard = ({navigation}) => {
           <TouchableOpacity
             style={[styles.card, styles.cardThree, styles.columnTile]} onPress={
               ()=>{navigation.navigate('Activity')}}>
-            <Image
-              source={require('../assets/graphics/most-recent.png')}
-              style={styles.image3}
-              resizeMode="contain"
-            />
+          <Icon name ='history' size={40} color='#fff'/>
             <Text style={[styles.cardText, styles.columnText]}>
               Recent Activity
             </Text>
           </TouchableOpacity>
         </View>
+      </View>
+      <Text></Text>
+      <View style={{
+        padding: 8,
+        margin: 8,
+        marginTop: -20,
+        flexDirection: 'row',
+        borderRadius: 8,
+        width: '100%',
+      }}>
+        <TouchableOpacity style={styles.cardFour}>
+          <Icon name ='chat' size={40} color='#fff'/>
+          <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Chat Room</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cardFour}>
+          <AntIcon name ='setting' size={40} color='#fff'/>
+          <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Settings</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -78,21 +86,37 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 20,
     margin: 5,
+    elevation: 10,
   },
   cardOne: {
-    backgroundColor: '#1abc9c',
+    backgroundColor: '#34e7e4',
     height: 208,
     width: '50%', // 50% of the width
+
   },
   cardTwo: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#0be881',
     width: '100%', // 40% of the width
+    gap: 20,
   },
   cardThree: {
-    backgroundColor: '#a29bfe',
+    backgroundColor: '#4bcffa',
     width: '100%', // 30% of the width
+    gap: 20,
+  },
+  cardFour: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    margin: 5,
+    elevation: 10,
+    backgroundColor: '#0abde3',
+    flexDirection: 'row',
+    height: heightPercentageToDP('10%'),
+    width: widthPercentageToDP('45%'),
+    gap: 10,
   },
   columnTile: {
     height: 100,

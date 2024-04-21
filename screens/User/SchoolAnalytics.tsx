@@ -37,6 +37,7 @@ const SchoolAnalytics = ({navigation}) => {
   const [SchoolNewData, setSchoolNewData] = useState([]);
 
   const onRefresh = async () => {
+    setRefreshing(true);
     const collectionRef = collection(Firebase_DB, 'Schools'); // Change 'Schools' to the correct collection name
     const schoolName = store.getState().CurrentSchool; // Change 'schoolname' to 'schoolName'
     console.log('schoolName:', schoolName);
@@ -51,6 +52,9 @@ const SchoolAnalytics = ({navigation}) => {
       store.dispatch({type: 'CURRENT_SCHOOL_DATA', payload: docData}); // Dispatch the data to the store
     });
     setDataExist(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
   };
 
   useEffect(() => {
@@ -169,6 +173,7 @@ const SchoolAnalytics = ({navigation}) => {
                 <Text style={styles.title}>
                   Data Analysis for Last 6 Months
                 </Text>
+
                 <Linechart
                   chartdata={
                     store.getState().CurrentSchoolData.prevpass.length > 0

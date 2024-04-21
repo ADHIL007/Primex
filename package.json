@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.21.0",
+    "@react-native-community/blur": "^4.4.0",
     "@react-native-community/checkbox": "^0.5.16",
     "@react-native-community/cli-doctor": "^12.0.0",
     "@react-native-community/progress-bar-android": "^1.0.5",
@@ -42,6 +43,7 @@
     "react-native-crypto-js": "^1.0.0",
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^2.15.0",
+    "react-native-gifted-chat": "^2.4.0",
     "react-native-paper": "^5.11.5",
     "react-native-picker-select": "^9.0.0",
     "react-native-randombytes": "^3.6.1",

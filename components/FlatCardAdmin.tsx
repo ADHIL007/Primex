@@ -2,17 +2,18 @@ import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntIcon from 'react-native-vector-icons/AntDesign';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 const FlatCardAdmin = ({navigation}: any) => {
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.bigButton}
         onPress={() => navigation.navigate('Analytics')}>
-        <Image
-          source={require('../assets/graphics/statistics.png')}
-          style={styles.buttonImage}
-        />
+        <Icon name='google-analytics' size={90} color='white'/>
         <Text style={styles.buttonText}>Analytics</Text>
       </TouchableOpacity>
 
@@ -64,6 +65,14 @@ const FlatCardAdmin = ({navigation}: any) => {
 
         <Text style={styles.buttonText}>Manage Schools</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.cardFour}>
+          <Icon name ='chat' size={40} color='#fff'/>
+          <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Chat Room</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cardFour}>
+          <AntIcon name ='setting' size={40} color='#fff'/>
+          <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Settings</Text>
+        </TouchableOpacity>
     </View>
   );
 };
@@ -83,42 +92,58 @@ const styles = StyleSheet.create({
   bigButton: {
     width: '55%', // Adjust as needed
     height: 200,
-    backgroundColor: '#52D3D8', // Pink background for Analytics
+    backgroundColor: '#34e7e4', // Pink background for Analytics
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 10,
-    borderRadius: 12,
+    borderRadius: 20,
     flexDirection: 'column',
+
   },
   mediumButton: {
+
     width: '100%', // Adjust as needed
     height: 87,
-    backgroundColor: '#6BCB77', // Green background for Requests and Representatives
+    backgroundColor: '#0be881', // Green background for Requests and Representatives
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 10,
-    borderRadius: 10,
+    borderRadius: 20,
     flexDirection: 'row',
+
   },
   smallButton: {
     width: '100%', // Takes full width
     height: 60,
-    backgroundColor: '#3498DB', // Blue background for Recent Activity
+    backgroundColor: '#ff4d4d', // Blue background for Recent Activity
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 10,
-    borderRadius: 8,
+    borderRadius: 20,
     flexDirection: 'row',
+
+  },
+  cardFour: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    margin: 5,
+    backgroundColor: '#0abde3',
+    flexDirection: 'row',
+    height: heightPercentageToDP('10%'),
+    width: widthPercentageToDP('45%'),
+    gap: 10,
   },
   MedBtn: {
-    width: '45%', // Adjust as needed
-    height: 87,
-    backgroundColor: '#78D6C6', // Orange background for Add Schools
-    alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 10,
-    borderRadius: 10,
+    alignItems: 'center',
+    borderRadius: 20,
+    margin: 5,
+    backgroundColor: '#26de81',
     flexDirection: 'row',
+    height: heightPercentageToDP('10%'),
+    width: widthPercentageToDP('45%'),
+    gap: 10,
   },
   buttonText: {
     fontSize: RFPercentage(2.1),

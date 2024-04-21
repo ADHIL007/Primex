@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import store from '../Redux/Store';
-import { RFPercentage } from 'react-native-responsive-fontsize';
-import { getData } from '../screens/AsyncStorage';
-
+import {RFPercentage} from 'react-native-responsive-fontsize';
+import {getData} from '../screens/AsyncStorage';
+import Svg, {Circle, Path, Rect} from 'react-native-svg';
+import {heightPercentageToDP} from 'react-native-responsive-screen';
 const CountOfSchools = () => {
   const [staffs, setStaffs] = useState(null);
 
@@ -34,6 +35,7 @@ const CountOfSchools = () => {
       {/* Circle container */}
       <View style={styles.circleContainer}>
         {/* Left semicircle */}
+
         <View style={styles.semicircleContainer}>
           <Text style={styles.smalltext}>4</Text>
           <Text style={styles.smalltextlabel}>Regions</Text>
@@ -46,53 +48,59 @@ const CountOfSchools = () => {
         </View>
         {/* Right semicircle */}
         <View style={styles.semicircleContainer}>
-        <Text style={styles.smalltext}>{staffs}</Text>
+          <Text style={styles.smalltext}>{staffs}</Text>
           <Text style={styles.smalltextlabel}>Staffs</Text>
         </View>
       </View>
-      <View style={styles.line}></View>
+
+      <View style={styles.line}>
+        <Svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 100 6"
+          width="100%"
+          height="6"
+          style={{marginTop: 60, marginLeft: -170}}>
+          <Rect x="0" y="0" width="80%" height="6" rx="5" fill="#fff" />
+        </Svg>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-line:{
-  width: '60%',
-  height: 6,
-  borderRadius: 5,
-  marginTop: 60,
-  backgroundColor: '#fff',
-},
+  line: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     height: 300,
-    backgroundColor: '#1e272e',
     marginTop: 10,
   },
-  majorcircleContainer:{
-    display:'flex',
-    flexDirection:'row',
-   backgroundColor: '#fff',
+  majorcircleContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    backgroundColor: '#fff',
   },
-  smalltext:{
+  smalltext: {
     color: '#1e272e', // Change text color to white
     fontSize: RFPercentage(4),
     fontFamily: 'Railway',
   },
-  smalltextlabel:{
+  smalltextlabel: {
     color: '#1e272e', // Change text color to white
     fontSize: RFPercentage(2),
     fontFamily: 'Railway',
   },
-  semicircleContainer:{
-    height:80,
-    width:80,
-    borderRadius:125,
+  semicircleContainer: {
+    height: 80,
+    width: 80,
+    borderRadius: 125,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth:0.5,
 
     marginHorizontal: 10, // Add margin horizontally
     marginTop: 135,
@@ -111,7 +119,7 @@ line:{
     zIndex: 1, // Ensure admin container is above the circle container
   },
   adminText: {
-    color:"#1e272e",
+    color: '#1e272e',
     fontSize: RFPercentage(2.5),
     marginLeft: 5,
   },
@@ -121,13 +129,11 @@ line:{
     flexDirection: 'row', // Align items horizontally
   },
   circle: {
-    height:190,
-    width:190,
-    borderRadius:95,
+    height: 190,
+    width: 190,
+    borderRadius: 95,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth:15,
-    borderColor: '#00FEFC',
     marginTop: 35,
     backgroundColor: '#fff',
   },

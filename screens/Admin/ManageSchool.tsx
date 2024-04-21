@@ -64,7 +64,7 @@ const ManageSchool = () => {
                     Performance: {school.perfomance ? school.perfomance : 'N/A'}
                   </Text>
                 </View>
-                {school.status === '' ? (
+                {school.Classrooms == 0  ? (
                   <Text style={styles.statusLabel}>Data is not updated</Text>
                 ) : (
                   <Text style={styles.statusLabelGreen}>

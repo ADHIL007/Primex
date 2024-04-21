@@ -193,7 +193,7 @@ const TableGen = () => {
                                 : '#0be881',
                           },
                         ]}>
-                        {chartData[index].toFixed(2)}%
+                        {Math.round(chartData[index])}%
                       </Text>
 
                       <Text
@@ -208,11 +208,11 @@ const TableGen = () => {
                         ]}>
 
                       {'['}{passpercentage > chartData[index].toFixed(2)
-                          ? (passpercentage -
-                          chartData[index].toFixed(2)).toFixed(1) +
+                          ? Math.round(passpercentage -
+                          chartData[index]) +
                             '%' +
                             '-'
-                          : (chartData[index].toFixed(2) -
+                          : Math.round(chartData[index] -
                           passpercentage).toFixed(1) +
                             '%' +
                             '+'} {']'}
@@ -254,6 +254,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
     paddingVertical: 40, // Adjust as needed
+    backgroundColor: '#ffff',
   },
   maincontainer: {
     flex: 1,
@@ -268,7 +269,6 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     marginBottom: 20,
-    backgroundColor: '#fff',
     height: 330,
   },
   chartValue: {

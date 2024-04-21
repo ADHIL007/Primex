@@ -108,14 +108,14 @@ const styles = StyleSheet.create({
   },
   Flatcontainer: {
     flex: 1,
-    backgroundColor: '#ffff',
+    backgroundColor: '#ffffff',
     borderTopEndRadius: 50,
     borderTopStartRadius: 50,
     height: 600,
   },
   scrollView: {
     flex: 1,
-    backgroundColor: '#1e272e',
+    backgroundColor: '#18dcff',
   },
   alertContainer: {
     position: 'absolute',

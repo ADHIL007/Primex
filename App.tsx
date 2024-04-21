@@ -21,6 +21,9 @@ import UpdateData from './screens/User/UpdateData';
 import Activity from './screens/User/Activity';
 import Class from './screens/Admin/Class';
 import PredReport from './screens/User/PredReport';
+import DetailedView from './screens/Admin/DetailedView';
+import ExcessStaffsView from './screens/Admin/ExcessStaffsView';
+import Chatroom from './screens/Chatroom';
 
 export type RootStackParamList = {
   Admin: undefined;
@@ -49,7 +52,13 @@ export type RootStackParamList = {
   UpdateData: undefined;
   Activity: undefined;
   Class: undefined;
-  PredReport:undefined
+  PredReport: undefined;
+  DetailedView: {
+    school: {};
+    schools: {};
+  };
+  ExcessStaffsView:undefined;
+  Chatroom:undefined
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -74,10 +83,26 @@ const App = (): JSX.Element => {
           }}
         />
         <Stack.Screen
+          name="Chatroom"
+          component={Chatroom}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="Signup"
           component={Signup}
           options={{
             headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="ExcessStaffsView"
+          component={ExcessStaffsView}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: '',
           }}
         />
         <Stack.Screen
@@ -128,7 +153,15 @@ const App = (): JSX.Element => {
             headerTitle: '',
           }}
         />
-
+        <Stack.Screen
+          name="DetailedView"
+          component={DetailedView}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
         <Stack.Screen
           name="LogoutAnime"
           component={LogoutAnime}

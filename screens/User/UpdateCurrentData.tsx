@@ -107,18 +107,18 @@ const UpdateCurrentData = () => {
 
 
 
-              // Reset state variables
-              // setBoys('');
-              // setGirls('');
-              // setTotalTests('');
-              // setAverageAttendance('');
-              // setAverageTestPrepScore('');
-              // setAverageMentalHealthScore('');
-              // setAveragePassPercentage('');
-              // setBenchAndDesk('');
-              // setComputer('');
-              // setBoard('');
-              // setClassrooms('');
+
+              setBoys('');
+              setGirls('');
+              setTotalTests('');
+              setAverageAttendance('');
+              setAverageTestPrepScore('');
+              setAverageMentalHealthScore('');
+              setAveragePassPercentage('');
+              setBenchAndDesk('');
+              setComputer('');
+              setBoard('');
+              setClassrooms('');
             } catch (error) {
               console.error('Error submitting data:', error);
               Alert.alert(

@@ -21,6 +21,7 @@ import {
 import { Firebase_DB, Firebase_Auth } from '../FirebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth/cordova';
 import store from '../../Redux/Store';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const Requests = () => {
   const [reqs, setReqs] = useState([]);
@@ -125,7 +126,7 @@ const Requests = () => {
       <Text style={styles.title}>Requests</Text>
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#00B8A9" />
+          <ActivityIndicator size={RFValue(30)} color="#00B8A9" />
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       ) : empty ? (
@@ -179,23 +180,23 @@ const Requests = () => {
 
 const styles = StyleSheet.create({
   emptyImage: {
-    width: 250,
-    height: 250,
-    marginBottom: 20,
-    borderRadius: 10,
+    width: RFValue(250),
+    height: RFValue(250),
+    marginBottom: RFValue(20),
+    borderRadius: RFValue(10),
     overflow: 'hidden',
     alignSelf: 'center',
     resizeMode: 'contain',
-    marginTop: 20,
+    marginTop: RFValue(20),
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: RFValue(20),
     flex: 1,
   },
   emptyText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     color: '#333',
     fontStyle: 'italic',
     textAlign: 'center',
@@ -203,16 +204,13 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 40,
+    padding: RFValue(20),
+    paddingTop: RFValue(40),
   },
   title: {
-    fontSize: 34,
+    fontSize: RFValue(24),
     fontWeight: 'bold',
-    marginBottom: 20,
-
+    marginBottom: RFValue(20),
     textAlign: 'center',
     color: '#00B8A9',
   },
@@ -222,39 +220,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 10,
-    fontSize: 18,
+    marginTop: RFValue(10),
+    fontSize: RFValue(18),
     color: '#00B8A9',
     fontStyle: 'italic',
   },
   requestContainer: {
     backgroundColor: '#fff',
-    padding: 20,
-    margin: 25,
-    borderRadius: 12,
-    width: 350,
+    padding: RFValue(20),
+    marginVertical: RFValue(10),
+    borderRadius: RFValue(12),
+    width: '90%',
+    alignSelf: 'center',
     borderWidth: 1,
     borderColor: '#ddd',
     elevation: 2,
   },
   requestText: {
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: RFValue(16),
+    marginBottom: RFValue(8),
     color: '#333',
   },
   iconContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: 10,
+    marginTop: RFValue(10),
   },
   iconButton: {
-    marginLeft: 10,
-    padding: 8,
-    borderRadius: 8,
+    marginLeft: RFValue(10),
+    padding: RFValue(8),
+    borderRadius: RFValue(8),
   },
   iconImage: {
-    width: 24,
-    height: 24,
+    width: RFValue(24),
+    height: RFValue(24),
   },
 });
 

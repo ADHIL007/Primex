@@ -17,7 +17,7 @@ const AdminNavigationTab = () => {
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
-        tabBarActiveTintColor: '#00B8A9',
+        tabBarActiveTintColor: '#18dcff',
         tabBarStyle: {
           height: 60,
           backgroundColor: '#FFFFFF',

@@ -1,15 +1,19 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import store from '../../Redux/Store';
-import {collection, getDoc, getDocs} from 'firebase/firestore';
-import {Firebase_DB} from '../FirebaseConfig';
 import {Skeleton} from '@rneui/themed';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {RFPercentage} from 'react-native-responsive-fontsize';
-import {getData, storeData} from '../AsyncStorage';
+import {heightPercentageToDP} from 'react-native-responsive-screen';
 
-const TopBannerTiles = ({location, isLoading,staffs,students,region,rating}) => {
-
+const TopBannerTiles = ({
+  location,
+  isLoading,
+  staffs,
+  students,
+  region,
+  rating,
+}:any) => {
   return (
     <View style={styles.container}>
       <View style={styles.gridContainer}>
@@ -29,14 +33,18 @@ const TopBannerTiles = ({location, isLoading,staffs,students,region,rating}) => 
           {isLoading ? (
             <Skeleton animation="pulse" width={20} height={15} />
           ) : (
-            <Text style={[styles.gridItemText, {fontSize: RFPercentage(2.1)}]}>
-              {`${location}`}
+            <Text
+              style={[
+                styles.gridItemText,
+                {fontSize: RFPercentage(2.2), color: '#17c0eb'},
+              ]}>
+              {` ${location}`}
             </Text>
           )}
           <MaterialIcons
             name="location-on"
             size={RFPercentage(1.7)}
-            color="#333"
+            color="#17c0eb"
           />
         </View>
 
@@ -117,21 +125,21 @@ const TopBannerTiles = ({location, isLoading,staffs,students,region,rating}) => 
             <Skeleton animation="pulse" width={70} height={75} />
           ) : (
             <Text
-  style={[
-    styles.gridItemText,
-    {
-      fontWeight: 'bold',
-      fontSize: RFPercentage(5.5),
-      color: rating < 2.5
-        ? '#e74c3c'
-        : rating < 3.5
-        ? '#f1c40f'
-        : '#2ecc71',
-    },
-  ]}>
-  {store.getState().CurrentSchoolData?.rating}
-</Text>
-
+              style={[
+                styles.gridItemText,
+                {
+                  fontWeight: 'bold',
+                  fontSize: RFPercentage(5.5),
+                  color:
+                    rating < 2.5
+                      ? '#e74c3c'
+                      : rating < 3.6
+                      ? '#f1c40f'
+                      : '#2ecc71',
+                },
+              ]}>
+              {store.getState().CurrentSchoolData?.rating}
+            </Text>
           )}
           <Text style={{color: '#333'}}>Rating</Text>
         </View>
@@ -146,24 +154,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-
+    zIndex: 10,
     marginTop: 20,
   },
   gridContainer: {
     width: '90%',
+    height: heightPercentageToDP('25%'),
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
     alignItems: 'center',
-    padding: 20,
-    borderRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
+    borderRadius: 30,
     shadowColor: '#000',
-    shadowOffset: {width: 1, height: 1},
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
-    borderBottomWidth: 0,
+    padding: 10,
   },
   gridItem: {
     width: '45%',
