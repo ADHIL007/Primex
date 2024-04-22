@@ -124,12 +124,12 @@ const SchoolAnalytics = ({navigation}) => {
       const responseData = await response.json();
       const predictions = responseData.predictions;
 
-      // Check if performance is decreasing
+
       const lastHistoricalValue = data[data.length - 1];
       const firstPredictedValue = predictions[0];
       const decreasing = lastHistoricalValue > firstPredictedValue;
 
-      // Set the state for predictions and decreasing
+
       setPrediction(predictions);
       setDecreasing(decreasing);
       const collectionRef = collection(Firebase_DB, 'Schools');

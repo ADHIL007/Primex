@@ -69,7 +69,7 @@ const FlatCardAdmin = ({navigation}: any) => {
           <Icon name ='chat' size={40} color='#fff'/>
           <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Chat Room</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.cardFour}>
+        <TouchableOpacity style={styles.cardFour} onPress={() => navigation.navigate('Settings')}>
           <AntIcon name ='setting' size={40} color='#fff'/>
           <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Settings</Text>
         </TouchableOpacity>
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
 
     width: '100%', // Adjust as needed
     height: 87,
-    backgroundColor: '#0be881', // Green background for Requests and Representatives
+    backgroundColor: '#33d9b2', // Green background for Requests and Representatives
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 10,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   smallButton: {
     width: '100%', // Takes full width
     height: 60,
-    backgroundColor: '#ff4d4d', // Blue background for Recent Activity
+    backgroundColor: '#ff5252', // Blue background for Recent Activity
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 10,

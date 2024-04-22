@@ -24,6 +24,7 @@ import PredReport from './screens/User/PredReport';
 import DetailedView from './screens/Admin/DetailedView';
 import ExcessStaffsView from './screens/Admin/ExcessStaffsView';
 import Chatroom from './screens/Chatroom';
+import Settings from './screens/Admin/Settings';
 
 export type RootStackParamList = {
   Admin: undefined;
@@ -58,7 +59,8 @@ export type RootStackParamList = {
     schools: {};
   };
   ExcessStaffsView:undefined;
-  Chatroom:undefined
+  Chatroom:undefined ;
+  Settings: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -99,6 +101,15 @@ const App = (): JSX.Element => {
         <Stack.Screen
           name="ExcessStaffsView"
           component={ExcessStaffsView}
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+             <Stack.Screen
+          name="Settings"
+          component={Settings}
           options={{
             headerShown: true,
             headerTransparent: true,

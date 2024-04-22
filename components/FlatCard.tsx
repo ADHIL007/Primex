@@ -45,7 +45,7 @@ const FlatCard = ({navigation}) => {
           <Icon name ='chat' size={40} color='#fff'/>
           <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Chat Room</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.cardFour}>
+        <TouchableOpacity style={styles.cardFour} onPress={() => navigation.navigate('Settings')}>
           <AntIcon name ='setting' size={40} color='#fff'/>
           <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Settings</Text>
         </TouchableOpacity>
