@@ -5,10 +5,12 @@ import store from '../../Redux/Store';
 import {getData, storeData} from '../AsyncStorage';
 import {RFPercentage} from 'react-native-responsive-fontsize';
 import {
+  addDoc,
   collection,
   getDoc,
   getDocs,
   query,
+  serverTimestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -158,6 +160,24 @@ const UpdatePrevPass = ({navigation, setshow}) => {
       store.dispatch({type: 'PushPrevPass', payload: data});
       console.log('Submitted pass percentage data:', data);
       setshow(false);
+      const user = await getData('USERID');
+
+
+
+              // Reference to the 'Logs' subcollection within the user's log document
+              const logUpdate = collection(Firebase_DB, 'Logs');
+
+
+              // Create the message object with the order field
+              const message = {
+                text: 'Data Updated: Data\'s for the Previous months',
+                sender: user,
+                timestamp: serverTimestamp(),
+
+              };
+
+              // Add the message to Firestore
+              await addDoc(logUpdate, message);
     } catch (error) {
       console.error('Error updating document:', error);
     } finally {

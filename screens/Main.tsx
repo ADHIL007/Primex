@@ -51,7 +51,7 @@ const Main = ({navigation}: MainProps) => {
         console.log('User status or ID is null');
         setTimeout(() => {
           setLoading(false);
-          navigation.replace('Login');
+          navigation.replace('Public');
         }, 3000);
       }
     } catch (error) {
@@ -78,7 +78,7 @@ const Main = ({navigation}: MainProps) => {
               : `You are logged in as ${user}`}
           </Text>
           <Text style={styles.emptyText}>
-            Redirecting to {response !== 'true' ? 'login' : 'Home'}...
+            Redirecting to {response !== 'true' ? 'Main Home' : 'Home'}...
           </Text>
           <ActivityIndicator size="large" color="#00B8A9" />
         </View>

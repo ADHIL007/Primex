@@ -5,12 +5,16 @@ import {RFPercentage} from 'react-native-responsive-fontsize';
 import store from '../../Redux/Store';
 import {Firebase_DB} from '../FirebaseConfig';
 import {
+  addDoc,
   collection,
+  doc,
   getDocs,
   query,
+  serverTimestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
+import {getData} from '../AsyncStorage';
 
 const UpdateCurrentData = () => {
   const [boys, setBoys] = useState('');
@@ -26,10 +30,7 @@ const UpdateCurrentData = () => {
   const [classrooms, setClassrooms] = useState('');
   const [noOfstaffs, setnoOfstaffs] = useState('');
 
-
-
   const handleSubmit = async () => {
-
     if (
       boys.trim() === '' ||
       girls.trim() === '' ||
@@ -63,15 +64,17 @@ const UpdateCurrentData = () => {
           text: 'Submit',
           onPress: async () => {
             try {
-
               const schoolData = store.getState().CurrentSchoolData;
               const {prevpass, ...rest} = schoolData;
               console.log(prevpass);
 
-              const updatedPrevPass = [...prevpass.slice(1), averagePassPercentage];
+              const updatedPrevPass = [
+                ...prevpass.slice(1),
+                averagePassPercentage,
+              ];
               console.log(updatedPrevPass);
 
-        const updatedSchoolData =     {
+              const updatedSchoolData = {
                 ...rest,
                 prevpass: updatedPrevPass,
                 averageTestPrepScore: averageTestPrepScore,
@@ -85,28 +88,43 @@ const UpdateCurrentData = () => {
                 Board: parseInt(board),
                 Classrooms: parseInt(classrooms),
                 numberOfStaffs: parseInt(noOfstaffs),
-              }
+              };
 
-                store.dispatch({
-                    type: 'CURRENT_SCHOOL_DATA',
-                    payload: updatedSchoolData,
-                });
+              store.dispatch({
+                type: 'CURRENT_SCHOOL_DATA',
+                payload: updatedSchoolData,
+              });
 
-                const collectionRef = collection(Firebase_DB, 'Schools');
-                const schoolName = store.getState().CurrentSchool;
-                const querySnapshot = await getDocs(
-                    query(collectionRef, where('schoolName', '==', schoolName)),
-                );
-                console.log(updatedSchoolData);
+              const collectionRef = collection(Firebase_DB, 'Schools');
+              const schoolName = store.getState().CurrentSchool;
+              const querySnapshot = await getDocs(
+                query(collectionRef, where('schoolName', '==', schoolName)),
+              );
+              console.log(updatedSchoolData);
 
-                querySnapshot.forEach(doc => {
-                    const docRef = doc.ref;
-                    updateDoc(docRef, updatedSchoolData);
-                });
+              querySnapshot.forEach(doc => {
+                const docRef = doc.ref;
+                updateDoc(docRef, updatedSchoolData);
+              });
+              // Get the user ID
+              const user = await getData('USERID');
 
 
 
+              // Reference to the 'Logs' subcollection within the user's log document
+              const logUpdate = collection(Firebase_DB, 'Logs');
 
+
+              // Create the message object with the order field
+              const message = {
+                text: 'Updated: Data for the current month',
+                sender: user,
+                timestamp: serverTimestamp(),
+
+              };
+
+              // Add the message to Firestore
+              await addDoc(logUpdate, message);
 
               setBoys('');
               setGirls('');

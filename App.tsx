@@ -25,7 +25,10 @@ import DetailedView from './screens/Admin/DetailedView';
 import ExcessStaffsView from './screens/Admin/ExcessStaffsView';
 import Chatroom from './screens/Chatroom';
 import Settings from './screens/Admin/Settings';
-
+import Chat from './screens/User/Chat';
+import ChatAdmin from './screens/Admin/ChatAdmin';
+import PublicView from './screens/PublicView';
+import DetailedPublicView from './screens/DetailedPublicView';
 export type RootStackParamList = {
   Admin: undefined;
   Home: undefined;
@@ -61,6 +64,12 @@ export type RootStackParamList = {
   ExcessStaffsView:undefined;
   Chatroom:undefined ;
   Settings: undefined;
+  RepChat : undefined ;
+  ChatAdmin: {user :string};
+  Public :undefined
+  DetailedPublicView : {
+    school: {};
+  }
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -77,6 +86,13 @@ const App = (): JSX.Element => {
             headerShown: false,
           }}
         />
+          <Stack.Screen
+          name="Public"
+          component={PublicView}
+          options={{
+            headerShown: false,
+          }}
+        />
         <Stack.Screen
           name="Home"
           component={User}
@@ -88,7 +104,24 @@ const App = (): JSX.Element => {
           name="Chatroom"
           component={Chatroom}
           options={{
-            headerShown: false,
+            headerShown: true,
+            headerTitle: 'Chat Room'
+          }}
+        />
+        <Stack.Screen
+          name="ChatAdmin"
+          component={ChatAdmin}
+          options={{
+            headerShown: true,
+            headerTitle: 'Chat Room'
+          }}
+        />
+         <Stack.Screen
+          name="DetailedPublicView"
+          component={DetailedPublicView}
+          options={{
+            headerShown: true,
+            headerTitle: ''
           }}
         />
         <Stack.Screen
@@ -178,6 +211,14 @@ const App = (): JSX.Element => {
           component={LogoutAnime}
           options={{
             headerShown: false,
+          }}
+        />
+          <Stack.Screen
+          name="RepChat"
+          component={Chat}
+          options={{
+            headerShown: true,
+            headerTitle : 'Chats'
           }}
         />
         <Stack.Screen

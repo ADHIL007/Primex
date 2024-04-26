@@ -65,7 +65,7 @@ const FlatCardAdmin = ({navigation}: any) => {
 
         <Text style={styles.buttonText}>Manage Schools</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.cardFour}>
+      <TouchableOpacity style={styles.cardFour} onPress={() => navigation.navigate('Chatroom')}>
           <Icon name ='chat' size={40} color='#fff'/>
           <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Chat Room</Text>
         </TouchableOpacity>

@@ -148,6 +148,7 @@ fetchRating()
                 : '0, 255, 0' // Green for values greater than or equal to 0.75
             }
             label={'staffs'}
+            Fcolor = "rgba(52, 73, 94,1.0)"
           />
           <Text
             style={{

@@ -41,7 +41,7 @@ const FlatCard = ({navigation}) => {
         borderRadius: 8,
         width: '100%',
       }}>
-        <TouchableOpacity style={styles.cardFour}>
+        <TouchableOpacity style={styles.cardFour} onPress={() => navigation.navigate('RepChat') }>
           <Icon name ='chat' size={40} color='#fff'/>
           <Text style={{color: '#fff', fontWeight: 'bold', fontSize: 20}}>Chat Room</Text>
         </TouchableOpacity>

@@ -8,7 +8,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 const {width, height} = Dimensions.get('window');
-const ProgressChart2 = ({data,color,label}) => {
+const ProgressChart2 = ({data,color,label,Fcolor}) => {
   const chartConfig = {
     backgroundGradientFrom: '#1E2923',
     backgroundGradientFromOpacity: 0,
@@ -54,7 +54,7 @@ if(label === 'rating'){
         />
        <Text style={
          {
-           color: 'rgba(52, 73, 94,1.0)',
+           color: Fcolor,
            fontSize: hp('3.5%'),
            fontWeight: 'bold',
            marginTop: hp('-15%'),

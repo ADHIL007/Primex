@@ -24,6 +24,8 @@ import {storeData} from './AsyncStorage';
 import LottieView from 'lottie-react-native';
 import store from '../Redux/Store';
 import LoginLoading from './LoginLoading';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import {heightPercentageToDP} from 'react-native-responsive-screen';
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const Login = ({navigation}: LoginProps) => {
@@ -33,31 +35,35 @@ const Login = ({navigation}: LoginProps) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // Added loading state
 
-
   const handleLogin = async () => {
     setLoading(true); // Set loading to true when login starts
     console.log('Login reached');
 
     const admin = {
-        userid: 'Admin',
-        password: '123',
+      userid: 'Admin',
+      password: '123',
     };
     console.log('Provided credentials:', userid, password); // Log provided credentials
 
     if (admin.userid === userid && admin.password === password) {
-        // For admin login
-        console.log('Admin login attempt:', userid, password); // Log admin login attempt
-        storeData('USERSTATUS', true);
-        storeData('USERID', 'ADMIN');
-        setLoginStatus(true);
-        console.log('Admin logged in successfully');
+      // For admin login
+      console.log('Admin login attempt:', userid, password); // Log admin login attempt
+      storeData('USERSTATUS', true);
+      storeData('USERID', 'ADMIN');
+      setLoginStatus(true);
+      console.log('Admin logged in successfully');
 
-        setTimeout(() => {
-            navigation.replace('Admin');
-        }, 5500);
-    } else if ((userid !== admin.userid && userid !== '' && password !== '')) // For regular user login
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, userid, password);
+      setTimeout(() => {
+        navigation.replace('Admin');
+      }, 5500);
+    } else if (userid !== admin.userid && userid !== '' && password !== '')
+      // For regular user login
+      try {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          userid,
+          password,
+        );
         console.log('User logged in successfully:', userCredential);
         storeData('USERSTATUS', true);
         storeData('USERID', userid);
@@ -65,83 +71,123 @@ const Login = ({navigation}: LoginProps) => {
 
         setLoginStatus(true);
         setTimeout(() => {
-            navigation.replace('Home');
+          navigation.replace('Home');
         }, 5500);
         store.dispatch({
-            type: 'USER',
-            payload: userid
+          type: 'USER',
+          payload: userid,
         });
-
-    } catch (error) {
+      } catch (error) {
         setLoading(false); // Reset loading on login failure
         console.log('Error', error);
         Alert.alert(error.message);
-    } else {
-        Alert.alert('Please enter username and password');
+      }
+    else {
+      Alert.alert('Please enter username and password');
     }
-};
+  };
 
-
-  return (<>
-    {loginStatus ? (
-      <LoginLoading />
-    ) : (
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome Back!</Text>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="User ID or email"
-            placeholderTextColor={styles.placeholder.color}
-            autoFocus={false}
-            value={userid}
-            onChangeText={text => setUserid(text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            keyboardType='numeric'
-            maxLength={6}
-            secureTextEntry={true}
-            placeholderTextColor={styles.placeholder.color}
-            value={password}
-            onChangeText={text => setPassword(text)}
-          />
-        </View>
-        <View style={styles.buttonCont}>
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            {loading ? (
-              (<ActivityIndicator color="#1e272e" size="small" />) // Show loading indicator
-            ) : (
-              <Text style={styles.buttonText}>Login</Text>
-            )}
-          </TouchableOpacity>
-          <View style={styles.linkCont}>
-            <Text style={{color: '#1e272e', fontSize: 18}}>
-              Don't Have an Account
-            </Text>
-            <Link
-              to={{screen: 'Signup'}}
-              style={{color: '#05c46b', fontSize: 18, fontStyle: 'italic'}}>
-              Sign up now
-            </Link>
+  return (
+    <>
+      {loginStatus ? (
+        <LoginLoading />
+      ) : (
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome Back!</Text>
+          <Text
+            style={{color: '#f53b57', fontSize: heightPercentageToDP('1.3%')}}>
+            Access restricted to officials. Only officials can log in and create an account
+          </Text>
+          <View style={styles.back}>
+            <TouchableOpacity
+              style={styles.login}
+              onPress={() => navigation.navigate('Public')}>
+              <AntDesign
+                name="back"
+                size={heightPercentageToDP('2.5%')}
+                color="#1e1e1e"
+              />
+              <Text
+                style={{
+                  color: '#1e1e1e',
+                  fontSize: heightPercentageToDP('2.3%'),
+                }}>
+                go back
+              </Text>
+            </TouchableOpacity>
           </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="User ID or email"
+              placeholderTextColor={styles.placeholder.color}
+              autoFocus={false}
+              value={userid}
+              onChangeText={text => setUserid(text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              keyboardType="numeric"
+              maxLength={6}
+              secureTextEntry={true}
+              placeholderTextColor={styles.placeholder.color}
+              value={password}
+              onChangeText={text => setPassword(text)}
+            />
+          </View>
+          <View style={styles.buttonCont}>
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              {loading ? (
+                <ActivityIndicator color="#1e272e" size="small" /> // Show loading indicator
+              ) : (
+                <Text style={styles.buttonText}>Login</Text>
+              )}
+            </TouchableOpacity>
+            <View style={styles.linkCont}>
+              <Text style={{color: '#1e272e', fontSize: 18}}>
+                Don't Have an Account
+              </Text>
+              <Link
+                to={{screen: 'Signup'}}
+                style={{color: '#05c46b', fontSize: 18, fontStyle: 'italic'}}>
+                Sign up now
+              </Link>
+            </View>
+          </View>
+
+          <LottieView
+            source={require('../assets/gifs/Login.json')}
+            autoPlay
+            loop
+            style={styles.lottCont}
+          />
         </View>
-
-    <LottieView
-      source={require('../assets/gifs/Login.json')}
-      autoPlay
-      loop
-      style={styles.lottCont}
-    />
-
-      </View>
-    )}
-  </>);
+      )}
+    </>
+  );
 };
 
 const styles = StyleSheet.create({
+  back: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    padding: 10,
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    zIndex: 10,
+  },
+  login: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderWidth: 0.3,
+    borderColor: '#1e1e1e',
+    borderRadius: 20,
+  },
   container: {
     flex: 1,
     position: 'relative',

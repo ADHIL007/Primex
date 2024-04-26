@@ -1,14 +1,27 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Logout from '../../components/Logout';
 import { RootStackParamList } from '../../App';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
+import {heightPercentageToDP} from 'react-native-responsive-screen';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 type ProfileProps = NativeStackScreenProps<RootStackParamList, 'Profile'>;
 
 const Profile: React.FC<ProfileProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
+      <View style={styles.back}>
+          <TouchableOpacity
+            style={styles.login}
+            onPress={() => navigation.navigate('Public')}>
+            <AntDesign
+              name="home"
+              size={heightPercentageToDP('2.5%')}
+              color="#1e1e1e"
+            />
+            <Text style={{color: '#1e1e1e', fontSize: heightPercentageToDP('2.3%') }}>Main Home</Text>
+          </TouchableOpacity></View>
+      <View></View>
       <View style={styles.imgcont}>
       <Image
         source={require('../../assets/Backgrounds/adminlogo.png')}
@@ -23,6 +36,25 @@ const Profile: React.FC<ProfileProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  back :{
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    padding: 10,
+    position :'absolute',
+    right:10,
+    top :10,
+   zIndex :10
+  },
+  login: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderWidth:.3,
+    borderColor: '#1e1e1e',
+    borderRadius :20,
+  },
   container: {
     flex: 1,
     alignItems: 'center',

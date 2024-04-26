@@ -31,7 +31,7 @@ const SchoolAnalytics = ({navigation}) => {
   const [dataExist, setDataExist] = useState(true);
   const [data, setData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [prevpass,setprevpass] = useState([])
   const [showPrediction, setShowPrediction] = useState(false);
   const [showPresent, setShowPresent] = useState(true);
   const [SchoolNewData, setSchoolNewData] = useState([]);
@@ -61,18 +61,17 @@ const SchoolAnalytics = ({navigation}) => {
     const SchoolData = store.getState().CurrentSchoolData;
     console.log('Prev pass:' + SchoolData.prevpass);
 
+    if (!SchoolData || !Array.isArray(SchoolData.prevpass)) {
+      console.log('Prev data is empty or not an array. Add school data to get analytics.');
+      setDataExist(false);
+      return; // Exit early if prevpass is not defined or not an array
+    }
+
+    setprevpass(SchoolData.prevpass);
     storeData('PREVPASS', SchoolData.prevpass);
     console.log('Prev pass:' + store.getState().CurrentSchoolData.prevpass);
 
-    try {
-      if (!SchoolData || SchoolData.prevpass.length === 0) {
-        console.log('Prev data is empty. Add school data to get analytics.');
-        setDataExist(false);
-      }
-      setData(SchoolData.prevpass);
-    } catch (error) {
-      console.error('An error occurred:', error);
-    }
+    setData(SchoolData.prevpass);
   }, []);
   const [prediction, setPrediction] = useState([]);
   const [decreasing, setDecreasing] = useState(true);
@@ -108,12 +107,14 @@ const SchoolAnalytics = ({navigation}) => {
     };
 
     const requestBody = JSON.stringify(generateRandomData());
-    console.log(requestBody);
+    const SchoolData = store.getState().CurrentSchoolData;
+    console.log("data"+[SchoolData.prevpass]);
+
 
     const requestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: requestBody,
+      body:  JSON.stringify(SchoolData.prevpass)
     };
 
     try {
@@ -122,15 +123,30 @@ const SchoolAnalytics = ({navigation}) => {
         requestOptions,
       );
       const responseData = await response.json();
-      const predictions = responseData.predictions;
-
+      const predictions = responseData.predicted_output;
+      console.log(predictions)
 
       const lastHistoricalValue = data[data.length - 1];
-      const firstPredictedValue = predictions[0];
+      const firstPredictedValue = predictions[5];
       const decreasing = lastHistoricalValue > firstPredictedValue;
+      const originalData = predictions;
 
+// Limit values to 100
+const limitedData = originalData.map(innerArray => {
+    return innerArray.map(value => {
+        if (value > 100) {
+            return 100;
+        }
+        return Math.round(value);
+    });
+});
 
-      setPrediction(predictions);
+console.log("limited array" , limitedData);
+
+const Pdata = limitedData;
+console.log(Pdata[0]);
+
+  setPrediction(Pdata[0]);
       setDecreasing(decreasing);
       const collectionRef = collection(Firebase_DB, 'Schools');
       const schoolName = store.getState().CurrentSchool;
@@ -153,7 +169,7 @@ const SchoolAnalytics = ({navigation}) => {
     } catch (error) {
       console.error(error);
     } finally {
-      // Ensure loading and chartloading are set to false after API call is completed
+
 
       setShowPrediction(true);
     }
@@ -246,7 +262,7 @@ const SchoolAnalytics = ({navigation}) => {
                     color: showPresent ? 'rgba(0, 0, 0, 0.5)' : '#2ecc71',
                   },
                 ]}>
-                Model
+                Predict
               </Text>
             </TouchableOpacity>
           </View>
@@ -255,7 +271,7 @@ const SchoolAnalytics = ({navigation}) => {
             <View>
               {decreasing ? (
                 <View
-                  style={[styles.statustextcont]}
+
                   style={[styles.statustextcont, {backgroundColor: '#ff3f34'}]}>
                   <Text style={[styles.statusText, {color: '#fff'}]}>
                     Performance Decreasing
@@ -306,7 +322,7 @@ const SchoolAnalytics = ({navigation}) => {
       )}
       <SchoolData data={SchoolNewData} />
 
-      {showPrediction &&<TouchableOpacity
+      {/* {showPrediction &&<TouchableOpacity
         style={styles.Reportcontainer}
         onPress={() => navigation.navigate('PredReport')}>
         <Text style={styles.Reporttitle}>Report</Text>
@@ -315,7 +331,7 @@ const SchoolAnalytics = ({navigation}) => {
           size={RFPercentage(2.5)}
           color="#fff"
         />
-      </TouchableOpacity>}
+      </TouchableOpacity>} */}
     </ScrollView>
   );
 };
